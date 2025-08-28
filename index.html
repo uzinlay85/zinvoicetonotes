@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZinNotes - UI Mockup</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .pulse {
+            box-shadow: 0 0 0 0 rgba(96, 165, 250, 0.7);
+            animation: pulse-blue 2s infinite;
+        }
+        @keyframes pulse-blue {
+            0% {
+                transform: scale(0.95);
+                box-shadow: 0 0 0 0 rgba(96, 165, 250, 0.7);
+            }
+            70% {
+                transform: scale(1);
+                box-shadow: 0 0 0 20px rgba(96, 165, 250, 0);
+            }
+            100% {
+                transform: scale(0.95);
+                box-shadow: 0 0 0 0 rgba(96, 165, 250, 0);
+            }
+        }
+        .highlight-correct { color: #22c55e; } /* green-500 */
+        .highlight-incorrect { color: #ef4444; text-decoration: line-through; } /* red-500 */
+    </style>
+</head>
+<body class="bg-gray-100 dark:bg-gray-900 flex items-center justify-center min-h-screen p-4">
+
+    <!-- App Container -->
+    <div class="w-full max-w-sm h-[800px] max-h-[90vh] bg-white dark:bg-black rounded-3xl shadow-2xl overflow-hidden flex flex-col border-4 border-gray-800">
+        
+        <!-- Main Content Area -->
+        <main class="flex-grow overflow-y-auto p-6">
+            
+            <!-- Home Screen (Default) -->
+            <div id="screen-home" class="screen flex flex-col items-center justify-center h-full text-center">
+                <h1 class="text-4xl font-bold text-gray-800 dark:text-white mb-4">ZinNotes</h1>
+                <p class="text-gray-500 dark:text-gray-400 mb-12 text-lg">မှတ်စုမှတ်ရန် အသံပီသစွာပြောပေးပါ</p>
+                <button class="w-40 h-40 bg-blue-500 hover:bg-blue-600 text-white rounded-full flex items-center justify-center transition-all duration-300 ease-in-out pulse">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="22"></line></svg>
+                </button>
+            </div>
+
+            <!-- Notes Screen -->
+            <div id="screen-notes" class="screen hidden">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-3xl font-bold text-gray-800 dark:text-white">Notes</h2>
+                    <button class="text-blue-500 hover:text-blue-600">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    </button>
+                </div>
+                <div class="space-y-4">
+                    <!-- Note Card 1 -->
+                    <div class="bg-gray-50 dark:bg-gray-800 p-4 rounded-xl cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                        <h3 class="font-semibold text-lg text-gray-900 dark:text-white truncate">Project brainstorming session</h3>
+                        <p class="text-gray-600 dark:text-gray-400 text-sm truncate mt-1">First, we need to define the core features for the MVP. Let's focus on the transcription engine and note-saving functionality...</p>
+                        <div class="flex justify-between items-center mt-3">
+                            <span class="text-xs text-gray-400 dark:text-gray-500">Today, 2:15 PM</span>
+                            <div class="flex space-x-3 text-gray-500 dark:text-gray-400">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Note Card 2 -->
+                    <div class="bg-gray-50 dark:bg-gray-800 p-4 rounded-xl cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                        <h3 class="font-semibold text-lg text-gray-900 dark:text-white truncate">My trip to Japan</h3>
+                        <p class="text-gray-600 dark:text-gray-400 text-sm truncate mt-1">Remember to book the train tickets for Kyoto and find a good ramen place near the hotel in Shibuya. Also, check the weather...</p>
+                        <div class="flex justify-between items-center mt-3">
+                             <span class="text-xs text-gray-400 dark:text-gray-500">Yesterday, 9:40 AM</span>
+                            <div class="flex space-x-3 text-gray-500 dark:text-gray-400">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- History Screen -->
+            <div id="screen-history" class="screen hidden">
+                <h2 class="text-3xl font-bold text-gray-800 dark:text-white mb-6">History</h2>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Unsaved transcriptions are kept for 24 hours.</p>
+                <div class="space-y-4">
+                    <!-- History Item 1 -->
+                    <div class="bg-gray-50 dark:bg-gray-800 p-4 rounded-xl">
+                        <p class="text-gray-700 dark:text-gray-300 text-sm">Quick reminder to call mom tomorrow for her birthday and order flowers...</p>
+                        <div class="flex justify-between items-center mt-2">
+                            <span class="text-xs text-gray-400 dark:text-gray-500">15 minutes ago</span>
+                            <button class="text-xs font-semibold text-blue-500 hover:underline">Save to Notes</button>
+                        </div>
+                    </div>
+                    <!-- History Item 2 -->
+                    <div class="bg-gray-50 dark:bg-gray-800 p-4 rounded-xl">
+                        <p class="text-gray-700 dark:text-gray-300 text-sm">Okay so the grocery list is milk, eggs, bread, chicken, and maybe some ice cream...</p>
+                        <div class="flex justify-between items-center mt-2">
+                            <span class="text-xs text-gray-400 dark:text-gray-500">2 hours ago</span>
+                            <button class="text-xs font-semibold text-blue-500 hover:underline">Save to Notes</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Study Mode Screen -->
+            <div id="screen-study" class="screen hidden">
+                <h2 class="text-3xl font-bold text-gray-800 dark:text-white mb-6">Study Mode</h2>
+                <div class="mb-6">
+                    <label for="language-select" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Practice Language:</label>
+                    <select id="language-select" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md">
+                        <option>Korean</option>
+                        <option>Japanese</option>
+                        <option>English</option>
+                        <option>Thai</option>
+                    </select>
+                </div>
+                
+                <div class="bg-gray-50 dark:bg-gray-800 p-5 rounded-xl space-y-4">
+                    <div>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Translate this phrase to Korean:</p>
+                        <p class="text-lg font-semibold text-gray-900 dark:text-white mt-1">"Hello, how are you?"</p>
+                    </div>
+                    <div class="border-t border-gray-200 dark:border-gray-700 pt-4">
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Your attempt:</p>
+                        <p class="text-lg text-gray-800 dark:text-gray-200 mt-1">
+                            <span class="highlight-correct">안녕하세요,</span>
+                            <span class="highlight-incorrect">어떻게</span>
+                            <span class="highlight-correct">지내세요?</span>
+                        </p>
+                        <div class="mt-3 bg-blue-100 dark:bg-blue-900/50 p-3 rounded-lg text-center">
+                            <p class="font-bold text-blue-800 dark:text-blue-300 text-xl">Accuracy: 95%</p>
+                            <p class="text-xs text-blue-600 dark:text-blue-400 mt-1">Correct: 어떻게</p>
+                        </div>
+                    </div>
+                </div>
+                 <button class="mt-8 w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-xl flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="22"></line></svg>
+                    Tap to Speak
+                </button>
+            </div>
+
+        </main>
+
+        <!-- Bottom Navigation Bar -->
+        <nav class="w-full bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700">
+            <div class="flex justify-around py-3">
+                <button data-target="screen-home" class="nav-btn text-blue-500 flex flex-col items-center space-y-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                    <span class="text-xs font-medium">Home</span>
+                </button>
+                <button data-target="screen-notes" class="nav-btn text-gray-500 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 flex flex-col items-center space-y-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+                    <span class="text-xs font-medium">Notes</span>
+                </button>
+                <button data-target="screen-history" class="nav-btn text-gray-500 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 flex flex-col items-center space-y-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                    <span class="text-xs font-medium">History</span>
+                </button>
+                <button data-target="screen-study" class="nav-btn text-gray-500 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 flex flex-col items-center space-y-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 14 4-4"></path><path d="M3.34 19a10 10 0 1 1 17.32 0"></path></svg>
+                    <span class="text-xs font-medium">Study</span>
+                </button>
+            </div>
+        </nav>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const navButtons = document.querySelectorAll('.nav-btn');
+            const screens = document.querySelectorAll('.screen');
+
+            // Set initial active state
+            const initialActiveButton = document.querySelector('.nav-btn[data-target="screen-home"]');
+            if (initialActiveButton) {
+                initialActiveButton.classList.add('text-blue-500');
+                initialActiveButton.classList.remove('text-gray-500', 'dark:text-gray-400');
+            }
+
+            navButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const targetScreenId = button.dataset.target;
+
+                    // Hide all screens
+                    screens.forEach(screen => {
+                        screen.classList.add('hidden');
+                    });
+
+                    // Show the target screen
+                    const targetScreen = document.getElementById(targetScreenId);
+                    if (targetScreen) {
+                        targetScreen.classList.remove('hidden');
+                    }
+
+                    // Update active button styles
+                    navButtons.forEach(btn => {
+                        btn.classList.remove('text-blue-500');
+                        btn.classList.add('text-gray-500', 'dark:text-gray-400');
+                    });
+                    button.classList.add('text-blue-500');
+                    button.classList.remove('text-gray-500', 'dark:text-gray-400');
+                });
+            });
+        });
+    </script>
+</body>
+</html>
