@@ -30,6 +30,23 @@
                 box-shadow: 0 0 0 0 rgba(96, 165, 250, 0);
             }
         }
+        .recording {
+            animation: pulse-red 1.5s infinite;
+        }
+        @keyframes pulse-red {
+            0% {
+                transform: scale(0.95);
+                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+            }
+            70% {
+                transform: scale(1);
+                box-shadow: 0 0 0 20px rgba(239, 68, 68, 0);
+            }
+            100% {
+                transform: scale(0.95);
+                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+            }
+        }
         .highlight-correct { color: #22c55e; } /* green-500 */
         .highlight-incorrect { color: #ef4444; text-decoration: line-through; } /* red-500 */
     </style>
@@ -45,10 +62,11 @@
             <!-- Home Screen (Default) -->
             <div id="screen-home" class="screen flex flex-col items-center justify-center h-full text-center">
                 <h1 class="text-4xl font-bold text-gray-800 dark:text-white mb-4">ZinNotes</h1>
-                <p class="text-gray-500 dark:text-gray-400 mb-12 text-lg">မှတ်စုမှတ်ရန် အသံပီသစွာပြောပေးပါ</p>
-                <button class="w-40 h-40 bg-blue-500 hover:bg-blue-600 text-white rounded-full flex items-center justify-center transition-all duration-300 ease-in-out pulse">
+                <p id="instructional-text" class="text-gray-500 dark:text-gray-400 mb-8 text-lg h-12">မှတ်စုမှတ်ရန် အသံပီသစွာပြောပေးပါ</p>
+                <button id="mic-button" class="w-40 h-40 bg-blue-500 hover:bg-blue-600 text-white rounded-full flex items-center justify-center transition-all duration-300 ease-in-out pulse">
                     <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="22"></line></svg>
                 </button>
+                <p id="transcription-output" class="text-gray-700 dark:text-gray-300 mt-8 text-lg h-24"></p>
             </div>
 
             <!-- Notes Screen -->
@@ -179,8 +197,14 @@
         document.addEventListener('DOMContentLoaded', () => {
             const navButtons = document.querySelectorAll('.nav-btn');
             const screens = document.querySelectorAll('.screen');
+            const micButton = document.getElementById('mic-button');
+            const instructionalText = document.getElementById('instructional-text');
+            const transcriptionOutput = document.getElementById('transcription-output');
+            
+            let isRecording = false;
+            let mockTranscriptionInterval;
 
-            // Set initial active state
+            // --- Navigation Logic ---
             const initialActiveButton = document.querySelector('.nav-btn[data-target="screen-home"]');
             if (initialActiveButton) {
                 initialActiveButton.classList.add('text-blue-500');
@@ -190,19 +214,10 @@
             navButtons.forEach(button => {
                 button.addEventListener('click', () => {
                     const targetScreenId = button.dataset.target;
-
-                    // Hide all screens
-                    screens.forEach(screen => {
-                        screen.classList.add('hidden');
-                    });
-
-                    // Show the target screen
+                    screens.forEach(screen => screen.classList.add('hidden'));
                     const targetScreen = document.getElementById(targetScreenId);
-                    if (targetScreen) {
-                        targetScreen.classList.remove('hidden');
-                    }
+                    if (targetScreen) targetScreen.classList.remove('hidden');
 
-                    // Update active button styles
                     navButtons.forEach(btn => {
                         btn.classList.remove('text-blue-500');
                         btn.classList.add('text-gray-500', 'dark:text-gray-400');
@@ -210,6 +225,43 @@
                     button.classList.add('text-blue-500');
                     button.classList.remove('text-gray-500', 'dark:text-gray-400');
                 });
+            });
+
+            // --- Microphone Button Logic ---
+            micButton.addEventListener('click', () => {
+                isRecording = !isRecording; // Toggle recording state
+
+                if (isRecording) {
+                    // Start recording simulation
+                    micButton.classList.remove('bg-blue-500', 'hover:bg-blue-600', 'pulse');
+                    micButton.classList.add('bg-red-500', 'hover:bg-red-600', 'recording');
+                    instructionalText.textContent = 'အသံဖမ်းယူနေသည်... ရပ်တန့်ရန်နှိပ်ပါ';
+                    
+                    // Simulate live transcription
+                    const mockWords = ["မင်္ဂလာပါ", "ZinNotes", "မှ", "ကြိုဆိုပါတယ်", "သင်ပြောသမျှကို", "မှတ်သားပေးပါ့မယ်"];
+                    let wordIndex = 0;
+                    transcriptionOutput.textContent = '';
+                    mockTranscriptionInterval = setInterval(() => {
+                        if (wordIndex < mockWords.length) {
+                            transcriptionOutput.textContent += mockWords[wordIndex] + ' ';
+                            wordIndex++;
+                        } else {
+                            clearInterval(mockTranscriptionInterval);
+                        }
+                    }, 500);
+
+                } else {
+                    // Stop recording simulation
+                    micButton.classList.add('bg-blue-500', 'hover:bg-blue-600', 'pulse');
+                    micButton.classList.remove('bg-red-500', 'hover:bg-red-600', 'recording');
+                    instructionalText.textContent = 'မှတ်စုမှတ်ရန် အသံပီသစွာပြောပေးပါ';
+                    clearInterval(mockTranscriptionInterval);
+                    // Here you would typically save the note
+                    // For now, we just clear the text after a delay
+                    setTimeout(() => {
+                        transcriptionOutput.textContent = '';
+                    }, 2000);
+                }
             });
         });
     </script>
