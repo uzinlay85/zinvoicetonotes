@@ -1,269 +1,426 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="my">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ZinNotes - UI Mockup</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title>ZinNotes - Your Multilingual AI Voice Companion</title>
     <style>
+        /* --- Global Styles & Variables --- */
+        :root {
+            --primary-color: #4A90E2; /* A modern blue */
+            --secondary-color: #F5A623; /* A warm orange for accents */
+            --background-color: #F4F6F8;
+            --text-color: #333;
+            --light-text-color: #FFF;
+            --card-bg-color: #FFFFFF;
+            --border-color: #E0E0E0;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
         }
-        .pulse {
-            box-shadow: 0 0 0 0 rgba(96, 165, 250, 0.7);
-            animation: pulse-blue 2s infinite;
+
+        /* --- Main App Container --- */
+        .app-container {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 20px;
+            padding-bottom: 80px; /* Space for nav bar */
         }
-        @keyframes pulse-blue {
-            0% {
-                transform: scale(0.95);
-                box-shadow: 0 0 0 0 rgba(96, 165, 250, 0.7);
-            }
-            70% {
-                transform: scale(1);
-                box-shadow: 0 0 0 20px rgba(96, 165, 250, 0);
-            }
-            100% {
-                transform: scale(0.95);
-                box-shadow: 0 0 0 0 rgba(96, 165, 250, 0);
-            }
+
+        /* --- Header --- */
+        .app-header {
+            text-align: center;
+            padding: 10px 20px;
+            border-bottom: 1px solid var(--border-color);
         }
-        .recording {
-            animation: pulse-red 1.5s infinite;
+
+        .app-header .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--primary-color);
         }
-        @keyframes pulse-red {
-            0% {
-                transform: scale(0.95);
-                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
-            }
-            70% {
-                transform: scale(1);
-                box-shadow: 0 0 0 20px rgba(239, 68, 68, 0);
-            }
-            100% {
-                transform: scale(0.95);
-                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
-            }
+
+        /* --- Page Content --- */
+        .page {
+            display: none; /* Hide all pages by default */
         }
-        .highlight-correct { color: #22c55e; } /* green-500 */
-        .highlight-incorrect { color: #ef4444; text-decoration: line-through; } /* red-500 */
+
+        .page.active {
+            display: block; /* Show only the active page */
+        }
+
+        /* --- Home/Transcription Page --- */
+        #home-page {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            height: 100%;
+        }
+
+        .instruction-text {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .mic-button {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 20px rgba(74, 144, 226, 0.4);
+            transition: transform 0.2s ease, background-color 0.2s ease;
+        }
+
+        .mic-button:hover {
+            transform: scale(1.05);
+        }
+        
+        .mic-button.recording {
+            background-color: #D0021B; /* Red when recording */
+            animation: pulse 1.5s infinite;
+        }
+
+        .mic-button svg {
+            width: 50px;
+            height: 50px;
+            fill: var(--light-text-color);
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(208, 2, 27, 0.7); }
+            70% { box-shadow: 0 0 0 20px rgba(208, 2, 27, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(208, 2, 27, 0); }
+        }
+        
+        .live-transcription {
+            margin-top: 30px;
+            font-size: 18px;
+            color: #555;
+            min-height: 50px;
+            width: 90%;
+            max-width: 600px;
+        }
+
+        /* --- Notes & History Page --- */
+        .note-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .note-card {
+            background-color: var(--card-bg-color);
+            border-radius: 12px;
+            padding: 15px 20px;
+            box-shadow: var(--shadow);
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+        
+        .note-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .note-card h3 {
+            margin: 0 0 8px 0;
+            font-size: 18px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .note-card p {
+            margin: 0;
+            font-size: 14px;
+            color: #666;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        /* --- Study Mode Page --- */
+        #study-page .category {
+            margin-bottom: 25px;
+        }
+        #study-page h2 {
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 5px;
+            margin-bottom: 15px;
+        }
+        .phrase-card {
+            background: var(--card-bg-color);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            box-shadow: var(--shadow);
+        }
+        .phrase-card .native {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .phrase-card .target-prompt {
+            font-size: 14px;
+            color: #555;
+        }
+
+        /* --- Bottom Navigation Bar --- */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 65px;
+            background-color: var(--card-bg-color);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.07);
+            border-top: 1px solid var(--border-color);
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: #888;
+            transition: color 0.2s ease;
+            flex-grow: 1;
+            height: 100%;
+        }
+
+        .nav-item.active {
+            color: var(--primary-color);
+        }
+        
+        .nav-item svg {
+            width: 24px;
+            height: 24px;
+            fill: currentColor;
+            margin-bottom: 4px;
+        }
+
+        .nav-item span {
+            font-size: 12px;
+        }
+
     </style>
 </head>
-<body class="bg-gray-100 dark:bg-gray-900 flex items-center justify-center min-h-screen p-4">
+<body>
 
-    <!-- App Container -->
-    <div class="w-full max-w-sm h-[800px] max-h-[90vh] bg-white dark:bg-black rounded-3xl shadow-2xl overflow-hidden flex flex-col border-4 border-gray-800">
+    <header class="app-header">
+        <div class="logo">ZinNotes</div>
+    </header>
+
+    <main class="app-container">
+        <!-- Page 1: Home (Transcription) -->
+        <div id="home-page" class="page active">
+            <p class="instruction-text">မှတ်စုမှတ်ရန် အသံပီသစွာပြောပေးပါ</p>
+            <button id="mic-btn" class="mic-button">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.49 6-3.31 6-6.72h-1.7z"/>
+                </svg>
+            </button>
+            <div id="live-transcription" class="live-transcription"></div>
+            <div id="language-selector" style="margin-top: 20px;">
+                <select id="lang-select" style="padding: 8px; border-radius: 8px; border: 1px solid var(--border-color);">
+                    <option value="my-MM">Myanmar (Burmese)</option>
+                    <option value="en-US">English</option>
+                    <option value="ja-JP">Japanese</option>
+                    <option value="ko-KR">Korean</option>
+                    <option value="th-TH">Thai</option>
+                    <option value="cmn-Hans-CN">Chinese (Mandarin)</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Page 2: Notes -->
+        <div id="notes-page" class="page">
+            <h2>Saved Notes</h2>
+            <div id="notes-list" class="note-list">
+                <!-- Sample Note -->
+                <div class="note-card">
+                    <h3>My First Note</h3>
+                    <p>This is a sample note to show how saved transcriptions will appear. Users can tap here to edit, share, or delete the note...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Page 3: History -->
+        <div id="history-page" class="page">
+            <h2>Recent History (Last 24h)</h2>
+            <div id="history-list" class="note-list">
+                 <div class="note-card">
+                    <h3>Transcription from 10:30 AM</h3>
+                    <p>This is an example of a raw transcription that wasn't explicitly saved. It will be automatically deleted after 24 hours...</p>
+                </div>
+            </div>
+        </div>
         
-        <!-- Main Content Area -->
-        <main class="flex-grow overflow-y-auto p-6">
-            
-            <!-- Home Screen (Default) -->
-            <div id="screen-home" class="screen flex flex-col items-center justify-center h-full text-center">
-                <h1 class="text-4xl font-bold text-gray-800 dark:text-white mb-4">ZinNotes</h1>
-                <p id="instructional-text" class="text-gray-500 dark:text-gray-400 mb-8 text-lg h-12">မှတ်စုမှတ်ရန် အသံပီသစွာပြောပေးပါ</p>
-                <button id="mic-button" class="w-40 h-40 bg-blue-500 hover:bg-blue-600 text-white rounded-full flex items-center justify-center transition-all duration-300 ease-in-out pulse">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="22"></line></svg>
-                </button>
-                <p id="transcription-output" class="text-gray-700 dark:text-gray-300 mt-8 text-lg h-24"></p>
-            </div>
-
-            <!-- Notes Screen -->
-            <div id="screen-notes" class="screen hidden">
-                <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-3xl font-bold text-gray-800 dark:text-white">Notes</h2>
-                    <button class="text-blue-500 hover:text-blue-600">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                    </button>
+        <!-- Page 4: Study Mode -->
+        <div id="study-page" class="page">
+            <h2>Study Mode</h2>
+            <div class="category">
+                <h3>Beginner Phrases</h3>
+                <div class="phrase-card">
+                    <div class="native">မြန်မာလို: မင်္ဂလာပါ</div>
+                    <div class="target-prompt">Speak in English: "Hello"</div>
+                    <button>Practice</button>
                 </div>
-                <div class="space-y-4">
-                    <!-- Note Card 1 -->
-                    <div class="bg-gray-50 dark:bg-gray-800 p-4 rounded-xl cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-                        <h3 class="font-semibold text-lg text-gray-900 dark:text-white truncate">Project brainstorming session</h3>
-                        <p class="text-gray-600 dark:text-gray-400 text-sm truncate mt-1">First, we need to define the core features for the MVP. Let's focus on the transcription engine and note-saving functionality...</p>
-                        <div class="flex justify-between items-center mt-3">
-                            <span class="text-xs text-gray-400 dark:text-gray-500">Today, 2:15 PM</span>
-                            <div class="flex space-x-3 text-gray-500 dark:text-gray-400">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg>
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Note Card 2 -->
-                    <div class="bg-gray-50 dark:bg-gray-800 p-4 rounded-xl cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-                        <h3 class="font-semibold text-lg text-gray-900 dark:text-white truncate">My trip to Japan</h3>
-                        <p class="text-gray-600 dark:text-gray-400 text-sm truncate mt-1">Remember to book the train tickets for Kyoto and find a good ramen place near the hotel in Shibuya. Also, check the weather...</p>
-                        <div class="flex justify-between items-center mt-3">
-                             <span class="text-xs text-gray-400 dark:text-gray-500">Yesterday, 9:40 AM</span>
-                            <div class="flex space-x-3 text-gray-500 dark:text-gray-400">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg>
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-                            </div>
-                        </div>
-                    </div>
+                 <div class="phrase-card">
+                    <div class="native">မြန်မာလို: ကျေးဇူးတင်ပါတယ်</div>
+                    <div class="target-prompt">Speak in English: "Thank you"</div>
+                    <button>Practice</button>
                 </div>
             </div>
-
-            <!-- History Screen -->
-            <div id="screen-history" class="screen hidden">
-                <h2 class="text-3xl font-bold text-gray-800 dark:text-white mb-6">History</h2>
-                <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Unsaved transcriptions are kept for 24 hours.</p>
-                <div class="space-y-4">
-                    <!-- History Item 1 -->
-                    <div class="bg-gray-50 dark:bg-gray-800 p-4 rounded-xl">
-                        <p class="text-gray-700 dark:text-gray-300 text-sm">Quick reminder to call mom tomorrow for her birthday and order flowers...</p>
-                        <div class="flex justify-between items-center mt-2">
-                            <span class="text-xs text-gray-400 dark:text-gray-500">15 minutes ago</span>
-                            <button class="text-xs font-semibold text-blue-500 hover:underline">Save to Notes</button>
-                        </div>
-                    </div>
-                    <!-- History Item 2 -->
-                    <div class="bg-gray-50 dark:bg-gray-800 p-4 rounded-xl">
-                        <p class="text-gray-700 dark:text-gray-300 text-sm">Okay so the grocery list is milk, eggs, bread, chicken, and maybe some ice cream...</p>
-                        <div class="flex justify-between items-center mt-2">
-                            <span class="text-xs text-gray-400 dark:text-gray-500">2 hours ago</span>
-                            <button class="text-xs font-semibold text-blue-500 hover:underline">Save to Notes</button>
-                        </div>
-                    </div>
-                </div>
+             <div class="category">
+                <h3>Intermediate Phrases</h3>
+                <p style="color: #888;">(Upgrade to Pro for access)</p>
             </div>
+        </div>
+    </main>
 
-            <!-- Study Mode Screen -->
-            <div id="screen-study" class="screen hidden">
-                <h2 class="text-3xl font-bold text-gray-800 dark:text-white mb-6">Study Mode</h2>
-                <div class="mb-6">
-                    <label for="language-select" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Practice Language:</label>
-                    <select id="language-select" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md">
-                        <option>Korean</option>
-                        <option>Japanese</option>
-                        <option>English</option>
-                        <option>Thai</option>
-                    </select>
-                </div>
-                
-                <div class="bg-gray-50 dark:bg-gray-800 p-5 rounded-xl space-y-4">
-                    <div>
-                        <p class="text-sm text-gray-500 dark:text-gray-400">Translate this phrase to Korean:</p>
-                        <p class="text-lg font-semibold text-gray-900 dark:text-white mt-1">"Hello, how are you?"</p>
-                    </div>
-                    <div class="border-t border-gray-200 dark:border-gray-700 pt-4">
-                        <p class="text-sm text-gray-500 dark:text-gray-400">Your attempt:</p>
-                        <p class="text-lg text-gray-800 dark:text-gray-200 mt-1">
-                            <span class="highlight-correct">안녕하세요,</span>
-                            <span class="highlight-incorrect">어떻게</span>
-                            <span class="highlight-correct">지내세요?</span>
-                        </p>
-                        <div class="mt-3 bg-blue-100 dark:bg-blue-900/50 p-3 rounded-lg text-center">
-                            <p class="font-bold text-blue-800 dark:text-blue-300 text-xl">Accuracy: 95%</p>
-                            <p class="text-xs text-blue-600 dark:text-blue-400 mt-1">Correct: 어떻게</p>
-                        </div>
-                    </div>
-                </div>
-                 <button class="mt-8 w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-xl flex items-center justify-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="22"></line></svg>
-                    Tap to Speak
-                </button>
-            </div>
-
-        </main>
-
-        <!-- Bottom Navigation Bar -->
-        <nav class="w-full bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700">
-            <div class="flex justify-around py-3">
-                <button data-target="screen-home" class="nav-btn text-blue-500 flex flex-col items-center space-y-1">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
-                    <span class="text-xs font-medium">Home</span>
-                </button>
-                <button data-target="screen-notes" class="nav-btn text-gray-500 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 flex flex-col items-center space-y-1">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
-                    <span class="text-xs font-medium">Notes</span>
-                </button>
-                <button data-target="screen-history" class="nav-btn text-gray-500 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 flex flex-col items-center space-y-1">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-                    <span class="text-xs font-medium">History</span>
-                </button>
-                <button data-target="screen-study" class="nav-btn text-gray-500 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 flex flex-col items-center space-y-1">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 14 4-4"></path><path d="M3.34 19a10 10 0 1 1 17.32 0"></path></svg>
-                    <span class="text-xs font-medium">Study</span>
-                </button>
-            </div>
-        </nav>
-    </div>
+    <nav class="bottom-nav">
+        <div class="nav-item" data-page="home-page">
+            <svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.49 6-3.31 6-6.72h-1.7z"/></svg>
+            <span>Home</span>
+        </div>
+        <div class="nav-item" data-page="notes-page">
+            <svg viewBox="0 0 24 24"><path d="M20 6h-8l-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V6h5.17l2 2H20v10z"/></svg>
+            <span>Notes</span>
+        </div>
+        <div class="nav-item" data-page="history-page">
+            <svg viewBox="0 0 24 24"><path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.25 2.52.77-1.28-3.52-2.09V8H12z"/></svg>
+            <span>History</span>
+        </div>
+        <div class="nav-item" data-page="study-page">
+            <svg viewBox="0 0 24 24"><path d="M18 4v14H6V4h12m2-2H4v18h16V2zm-7 10.5c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zM12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/></svg>
+            <span>Study</span>
+        </div>
+    </nav>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const navButtons = document.querySelectorAll('.nav-btn');
-            const screens = document.querySelectorAll('.screen');
-            const micButton = document.getElementById('mic-button');
-            const instructionalText = document.getElementById('instructional-text');
-            const transcriptionOutput = document.getElementById('transcription-output');
-            
-            let isRecording = false;
-            let mockTranscriptionInterval;
+        document.addEventListener('DOMContentLoaded', function() {
+            const pages = document.querySelectorAll('.page');
+            const navItems = document.querySelectorAll('.nav-item');
+            const micButton = document.getElementById('mic-btn');
+            const liveTranscriptionDiv = document.getElementById('live-transcription');
+            const langSelect = document.getElementById('lang-select');
 
-            // --- Navigation Logic ---
-            const initialActiveButton = document.querySelector('.nav-btn[data-target="screen-home"]');
-            if (initialActiveButton) {
-                initialActiveButton.classList.add('text-blue-500');
-                initialActiveButton.classList.remove('text-gray-500', 'dark:text-gray-400');
+            let isRecording = false;
+            let recognition;
+
+            // --- Page Navigation Logic ---
+            function showPage(pageId) {
+                pages.forEach(page => {
+                    page.classList.remove('active');
+                    if (page.id === pageId) {
+                        page.classList.add('active');
+                    }
+                });
+
+                navItems.forEach(item => {
+                    item.classList.remove('active');
+                    if (item.dataset.page === pageId) {
+                        item.classList.add('active');
+                    }
+                });
             }
 
-            navButtons.forEach(button => {
-                button.addEventListener('click', () => {
-                    const targetScreenId = button.dataset.target;
-                    screens.forEach(screen => screen.classList.add('hidden'));
-                    const targetScreen = document.getElementById(targetScreenId);
-                    if (targetScreen) targetScreen.classList.remove('hidden');
-
-                    navButtons.forEach(btn => {
-                        btn.classList.remove('text-blue-500');
-                        btn.classList.add('text-gray-500', 'dark:text-gray-400');
-                    });
-                    button.classList.add('text-blue-500');
-                    button.classList.remove('text-gray-500', 'dark:text-gray-400');
+            navItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    showPage(item.dataset.page);
                 });
             });
+            
+            // Set initial active state for Home
+            showPage('home-page');
+            document.querySelector('.nav-item[data-page="home-page"]').classList.add('active');
 
-            // --- Microphone Button Logic ---
+
+            // --- Speech Recognition Logic (Web Speech API) ---
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            
+            if (SpeechRecognition) {
+                recognition = new SpeechRecognition();
+                recognition.continuous = true; // Keep listening
+                recognition.interimResults = true; // Show results as they come in
+                
+                recognition.onstart = function() {
+                    isRecording = true;
+                    micButton.classList.add('recording');
+                    liveTranscriptionDiv.textContent = 'Listening...';
+                };
+
+                recognition.onend = function() {
+                    isRecording = false;
+                    micButton.classList.remove('recording');
+                    // Here you would add logic to save the final transcript to history or notes
+                    if (liveTranscriptionDiv.textContent !== 'Listening...') {
+                        alert('Transcription stopped. Final text: ' + liveTranscriptionDiv.textContent);
+                    }
+                };
+
+                recognition.onerror = function(event) {
+                    console.error('Speech recognition error:', event.error);
+                    liveTranscriptionDiv.textContent = 'Error: ' + event.error;
+                };
+
+                recognition.onresult = function(event) {
+                    let interimTranscript = '';
+                    let finalTranscript = '';
+
+                    for (let i = event.resultIndex; i < event.results.length; ++i) {
+                        if (event.results[i].isFinal) {
+                            finalTranscript += event.results[i][0].transcript;
+                        } else {
+                            interimTranscript += event.results[i][0].transcript;
+                        }
+                    }
+                    // Update the display with the live transcription
+                    liveTranscriptionDiv.textContent = finalTranscript + interimTranscript;
+                };
+
+            } else {
+                // Handle browsers that don't support the Web Speech API
+                micButton.disabled = true;
+                liveTranscriptionDiv.textContent = "Sorry, your browser doesn't support speech recognition.";
+            }
+
+            // --- Mic Button Click Handler ---
             micButton.addEventListener('click', () => {
-                isRecording = !isRecording; // Toggle recording state
+                if (!SpeechRecognition) return;
 
                 if (isRecording) {
-                    // Start recording simulation
-                    micButton.classList.remove('bg-blue-500', 'hover:bg-blue-600', 'pulse');
-                    micButton.classList.add('bg-red-500', 'hover:bg-red-600', 'recording');
-                    instructionalText.textContent = 'အသံဖမ်းယူနေသည်... ရပ်တန့်ရန်နှိပ်ပါ';
-                    
-                    // Simulate live transcription
-                    const mockWords = ["မင်္ဂလာပါ", "ZinNotes", "မှ", "ကြိုဆိုပါတယ်", "သင်ပြောသမျှကို", "မှတ်သားပေးပါ့မယ်"];
-                    let wordIndex = 0;
-                    transcriptionOutput.textContent = '';
-                    mockTranscriptionInterval = setInterval(() => {
-                        if (wordIndex < mockWords.length) {
-                            transcriptionOutput.textContent += mockWords[wordIndex] + ' ';
-                            wordIndex++;
-                        } else {
-                            clearInterval(mockTranscriptionInterval);
-                        }
-                    }, 500);
-
+                    recognition.stop();
                 } else {
-                    // Stop recording simulation
-                    micButton.classList.add('bg-blue-500', 'hover:bg-blue-600', 'pulse');
-                    micButton.classList.remove('bg-red-500', 'hover:bg-red-600', 'recording');
-                    instructionalText.textContent = 'မှတ်စုမှတ်ရန် အသံပီသစွာပြောပေးပါ';
-                    clearInterval(mockTranscriptionInterval);
-                    // Here you would typically save the note
-                    // For now, we just clear the text after a delay
-                    setTimeout(() => {
-                        transcriptionOutput.textContent = '';
-                    }, 2000);
+                    recognition.lang = langSelect.value; // Set language from dropdown
+                    recognition.start();
                 }
             });
         });
     </script>
+
 </body>
 </html>
