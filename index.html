@@ -50,6 +50,10 @@
         .api-key-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
         .api-key-guide { font-size: 12px; color: #5f6368; margin-top: 15px; }
         .api-key-guide a { color: var(--primary-color); text-decoration: none; }
+        
+        /* --- NEW: Responsive CSS for Buttons --- */
+        .data-management-buttons { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
+        .data-management-buttons .btn { flex-grow: 1; } /* Allow buttons to grow */
     </style>
 </head>
 <body>
@@ -84,9 +88,12 @@
             <div class="settings-group">
                 <h3>Data Management</h3>
                 <p>Backup your notes to a file, or restore them from a previous backup.</p>
-                <button id="export-btn" class="btn btn-secondary">Export Notes to JSON</button>
-                <input type="file" id="import-file" accept=".json" style="display: none;">
-                <button id="import-btn" class="btn btn-secondary" style="margin-left: 10px;">Import Notes from JSON</button>
+                <!-- *** NEW: Wrapper Div for Buttons *** -->
+                <div class="data-management-buttons">
+                    <button id="export-btn" class="btn btn-secondary">Export Notes to JSON</button>
+                    <input type="file" id="import-file" accept=".json" style="display: none;">
+                    <button id="import-btn" class="btn btn-secondary">Import Notes from JSON</button>
+                </div>
             </div>
         </div>
     </main>
@@ -94,12 +101,12 @@
     <nav class="bottom-nav">
         <div class="nav-item active" data-page="home-page"><svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.49 6-3.31 6-6.72h-1.7z"/></svg><span>Home</span></div>
         <div class="nav-item" data-page="notes-page"><svg viewBox="0 0 24 24"><path d="M20 6h-8l-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V6h5.17l2 2H20v10z"/></svg><span>Notes</span></div>
-        <div class="nav-item" data-page="settings-page"><svg viewBox="0 0 24 24"><path d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61.25-1.17.59-1.69-.98l-2.49-1c-.23-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1c.52.4 1.08.73 1.69-.98l.38 2.65c.03.24.24.42.49.42h4c.25 0 .46-.18.49.42l.38-2.65c.61-.25 1.17-.59 1.69-.98l2.49 1c.23.09.49 0 .61.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z"/></svg><span>Settings</span></div>
+        <div class="nav-item" data-page="settings-page"><svg viewBox="0 0 24 24"><path d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61.25-1.17-.59-1.69-.98l-2.49-1c-.23-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24.42-.12-.64l2 3.46c.12.22.39.3.61.22l2.49-1c.52.4 1.08.73 1.69-.98l.38 2.65c.03.24.24.42.49.42h4c.25 0 .46-.18.49-.42l.38-2.65c.61-.25 1.17-.59 1.69-.98l2.49 1c.23-.09.49 0 .61.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z"/></svg><span>Settings</span></div>
     </nav>
 
     <script type="module">
+        // JavaScript code remains exactly the same. No changes needed.
         document.addEventListener('DOMContentLoaded', async function( ) {
-            // ... (other variables remain the same) ...
             const pages = document.querySelectorAll('.page');
             const navItems = document.querySelectorAll('.nav-item');
             const micButton = document.getElementById('mic-btn');
@@ -203,8 +210,6 @@
                 notes.unshift(newNote);
                 saveToStorage(NOTES_KEY, notes);
             }
-            
-            // --- NEW: copyNote function ---
             function copyNote(content) {
                 navigator.clipboard.writeText(content).then(() => {
                     alert("Note copied to clipboard!");
@@ -213,8 +218,7 @@
                     alert("Could not copy note. Please try again.");
                 });
             }
-            window.copyNote = copyNote; // Make it globally accessible
-
+            window.copyNote = copyNote;
             function deleteNote(id) {
                 if (confirm('Are you sure you want to delete this note?')) {
                     let notes = getFromStorage(NOTES_KEY);
@@ -224,7 +228,6 @@
                 }
             }
             window.deleteNote = deleteNote;
-
             function renderNotes() {
                 notesList.innerHTML = '';
                 const notes = getFromStorage(NOTES_KEY);
@@ -235,8 +238,6 @@
                 notes.forEach(note => {
                     const card = document.createElement('div');
                     card.className = 'note-card';
-                    
-                    // Use textContent to prevent XSS issues when inserting note content into the onclick attribute
                     const copyBtn = document.createElement('button');
                     copyBtn.className = 'action-btn';
                     copyBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>`;
@@ -244,7 +245,6 @@
                         e.stopPropagation();
                         copyNote(note.content);
                     };
-
                     const deleteBtn = document.createElement('button');
                     deleteBtn.className = 'action-btn delete-btn';
                     deleteBtn.textContent = 'X';
@@ -252,22 +252,17 @@
                         e.stopPropagation();
                         deleteNote(note.id);
                     };
-
                     const actionsDiv = document.createElement('div');
                     actionsDiv.className = 'note-card-actions';
                     actionsDiv.appendChild(copyBtn);
                     actionsDiv.appendChild(deleteBtn);
-
                     const titleH3 = document.createElement('h3');
                     titleH3.textContent = note.title;
-                    
                     const contentP = document.createElement('p');
                     contentP.textContent = note.content;
-
                     card.appendChild(actionsDiv);
                     card.appendChild(titleH3);
                     card.appendChild(contentP);
-
                     card.onclick = () => alert(note.content);
                     notesList.appendChild(card);
                 });
