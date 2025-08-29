@@ -24,8 +24,8 @@
         .app-container { flex-grow: 1; overflow-y: auto; padding: 20px; padding-bottom: 80px; }
         .app-header { text-align: center; padding: 10px 20px; border-bottom: 1px solid var(--border-color); }
         .app-header .logo { font-size: 24px; font-weight: bold; color: var(--primary-color); }
-        .page { display: none; }
-        .page.active { display: block; }
+        .page { display: none; } /* All pages are hidden by default */
+        .page.active { display: block; } /* Only the active page is shown */
         #home-page { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; height: 100%; }
         .instruction-text { font-size: 16px; color: #5f6368; margin-bottom: 30px; }
         .mic-button { width: 120px; height: 120px; border-radius: 50%; background-color: var(--primary-color); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(66, 133, 244, 0.4); transition: all 0.2s ease; }
@@ -48,20 +48,31 @@
 </head>
 <body>
     <header class="app-header"><div class="logo">ZinNotes</div></header>
+    
     <main class="app-container">
+        <!-- API Key Section - Stays outside the pages -->
         <div id="api-key-section">
             <label for="api-key-input">Your Gemini API Key:</label>
             <input type="password" id="api-key-input" placeholder="Enter your API Key here">
             <button id="save-key-btn">Save</button>
         </div>
 
+        <!-- Page 1: Home (Active by default) -->
         <div id="home-page" class="page active">
             <p class="instruction-text">မှတ်စုမှတ်ရန် အသံပီသစွာပြောပေးပါ</p>
             <button id="mic-btn" class="mic-button"><svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.49 6-3.31 6-6.72h-1.7z"/></svg></button>
             <div id="live-transcription" class="live-transcription"></div>
         </div>
-        <div id="notes-page" class="page"><h2>Saved Notes</h2><div id="notes-list" class="note-list"></div></div>
+
+        <!-- Page 2: Notes (Hidden by default) -->
+        <div id="notes-page" class="page">
+            <h2>Saved Notes</h2>
+            <div id="notes-list" class="note-list">
+                <!-- Notes will be dynamically inserted here by JavaScript -->
+            </div>
+        </div>
     </main>
+
     <nav class="bottom-nav">
         <div class="nav-item active" data-page="home-page"><svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.49 6-3.31 6-6.72h-1.7z"/></svg><span>Home</span></div>
         <div class="nav-item" data-page="notes-page"><svg viewBox="0 0 24 24"><path d="M20 6h-8l-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V6h5.17l2 2H20v10z"/></svg><span>Notes</span></div>
@@ -91,7 +102,7 @@
                 if (key) {
                     localStorage.setItem(API_KEY, key);
                     alert('API Key saved successfully!');
-                    apiKeyInput.value = ''; // Clear for security
+                    apiKeyInput.value = '********'; // Mask the key after saving
                 } else {
                     alert('Please enter a valid API Key.');
                 }
@@ -102,14 +113,27 @@
             }
 
             saveKeyBtn.addEventListener('click', saveApiKey);
-            apiKeyInput.value = getApiKey() ? '********' : ''; // Show that a key is saved
+            if (getApiKey()) {
+                apiKeyInput.value = '********'; // Show that a key is already saved on load
+            }
 
             // --- PAGE NAVIGATION ---
             function showPage(pageId) {
+                // Hide all pages
                 pages.forEach(p => p.classList.remove('active'));
+                // Show the selected page
                 document.getElementById(pageId).classList.add('active');
-                navItems.forEach(item => item.classList.toggle('active', item.dataset.page === pageId));
-                if (pageId === 'notes-page') renderNotes();
+                
+                // Update active state for nav items
+                navItems.forEach(item => {
+                    item.classList.toggle('active', item.dataset.page === pageId);
+                });
+
+                // ** CRITICAL CHANGE HERE **
+                // If the notes page is being shown, render the notes.
+                if (pageId === 'notes-page') {
+                    renderNotes();
+                }
             }
             navItems.forEach(item => item.addEventListener('click', () => showPage(item.dataset.page)));
 
@@ -125,29 +149,21 @@
                 const genAI = new window.GoogleGenerativeAI(apiKey);
                 const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-                // Convert Blob to Base64
                 const reader = new FileReader();
                 reader.readAsDataURL(audioBlob);
                 await new Promise(resolve => reader.onload = resolve);
                 const base64Audio = reader.result.split(',')[1];
 
                 const audioPart = {
-                    inlineData: {
-                        data: base64Audio,
-                        mimeType: audioBlob.type,
-                    },
+                    inlineData: { data: base64Audio, mimeType: audioBlob.type },
                 };
 
                 try {
-                    const result = await model.generateContent([
-                        "Transcribe the following audio. The language is primarily Burmese (Myanmar).",
-                        audioPart
-                    ]);
-                    const response = await result.response;
-                    return response.text();
+                    const result = await model.generateContent(["Transcribe the following audio.", audioPart]);
+                    return result.response.text();
                 } catch (error) {
                     console.error("Error with Gemini API:", error);
-                    alert("Error during transcription. Check the console for details. Your API key might be invalid or have billing issues.");
+                    alert("Error during transcription. Check the console for details.");
                     return null;
                 }
             }
@@ -176,7 +192,7 @@
                         stream.getTracks().forEach(track => track.stop());
                     };
                 } catch (error) {
-                    alert("Microphone access was denied. Please allow it in your browser settings.");
+                    alert("Microphone access was denied.");
                 }
             }
 
@@ -208,18 +224,24 @@
             }
 
             function renderNotes() {
-                notesList.innerHTML = '';
-                getFromStorage(NOTES_KEY).forEach(note => {
+                notesList.innerHTML = ''; // Clear previous list
+                const notes = getFromStorage(NOTES_KEY);
+                if (notes.length === 0) {
+                    notesList.innerHTML = '<p>No saved notes yet. Go to the Home tab to record a new note.</p>';
+                    return;
+                }
+                notes.forEach(note => {
                     const card = document.createElement('div');
                     card.className = 'note-card';
                     card.innerHTML = `<h3>${note.title}</h3><p>${note.content}</p>`;
-                    card.onclick = () => alert(note.content);
+                    card.onclick = () => alert(note.content); // Simple view on click
                     notesList.appendChild(card);
                 });
             }
 
             // --- INITIAL LOAD ---
-            showPage('home-page');
+            // No need to call renderNotes() on initial load anymore.
+            // It will be called when the user clicks the "Notes" tab.
         });
     </script>
 </body>
