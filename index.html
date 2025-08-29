@@ -50,10 +50,8 @@
         .api-key-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
         .api-key-guide { font-size: 12px; color: #5f6368; margin-top: 15px; }
         .api-key-guide a { color: var(--primary-color); text-decoration: none; }
-        
-        /* --- NEW: Responsive CSS for Buttons --- */
         .data-management-buttons { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
-        .data-management-buttons .btn { flex-grow: 1; } /* Allow buttons to grow */
+        .data-management-buttons .btn { flex-grow: 1; }
     </style>
 </head>
 <body>
@@ -88,7 +86,6 @@
             <div class="settings-group">
                 <h3>Data Management</h3>
                 <p>Backup your notes to a file, or restore them from a previous backup.</p>
-                <!-- *** NEW: Wrapper Div for Buttons *** -->
                 <div class="data-management-buttons">
                     <button id="export-btn" class="btn btn-secondary">Export Notes to JSON</button>
                     <input type="file" id="import-file" accept=".json" style="display: none;">
@@ -101,7 +98,14 @@
     <nav class="bottom-nav">
         <div class="nav-item active" data-page="home-page"><svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.49 6-3.31 6-6.72h-1.7z"/></svg><span>Home</span></div>
         <div class="nav-item" data-page="notes-page"><svg viewBox="0 0 24 24"><path d="M20 6h-8l-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V6h5.17l2 2H20v10z"/></svg><span>Notes</span></div>
-        <div class="nav-item" data-page="settings-page"><svg viewBox="0 0 24 24"><path d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61.25-1.17-.59-1.69-.98l-2.49-1c-.23-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24.42-.12-.64l2 3.46c.12.22.39.3.61.22l2.49-1c.52.4 1.08.73 1.69-.98l.38 2.65c.03.24.24.42.49.42h4c.25 0 .46-.18.49-.42l.38-2.65c.61-.25 1.17-.59 1.69-.98l2.49 1c.23-.09.49 0 .61.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z"/></svg><span>Settings</span></div>
+        
+        <!-- *** FIXED: Correct SVG for Settings Icon *** -->
+        <div class="nav-item" data-page="settings-page">
+            <svg viewBox="0 0 24 24">
+                <path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.07-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.69-1.62-0.92L14.4,2.23C14.38,2.01,14.2,1.84,13.98,1.84 h-3.96c-0.22,0-0.4,0.17-0.43,0.39L9.2,4.55C8.61,4.78,8.08,5.09,7.58,5.47L5.19,4.51C4.97,4.44,4.72,4.51,4.6,4.73L2.68,8.05 c-0.11,0.2-0.06,0.47,0.12,0.61l2.03,1.58C4.78,10.56,4.76,10.86,4.76,11.16c0,0.3,0.02,0.6,0.06,0.9l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.69,1.62,0.92l0.39,2.32 c0.02,0.22,0.2,0.39,0.43,0.39h3.96c0.22,0,0.4-0.17,0.43-0.39l0.39-2.32c0.59-0.23,1.12-0.54,1.62-0.92l2.39,0.96 c0.22,0.07,0.47,0,0.59-0.22l1.92-3.32c0.11-0.2,0.06-0.47-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"/>
+            </svg>
+            <span>Settings</span>
+        </div>
     </nav>
 
     <script type="module">
@@ -288,36 +292,4 @@
                 importFileInput.click();
             }
             function handleImportFile(event) {
-                const file = event.target.files[0];
-                if (!file) return;
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    try {
-                        const importedNotes = JSON.parse(e.target.result);
-                        if (!Array.isArray(importedNotes)) {
-                            throw new Error("Invalid JSON format. Expected an array of notes.");
-                        }
-                        if (confirm(`Found ${importedNotes.length} notes in the file. Do you want to add them to your existing notes?`)) {
-                            const existingNotes = getFromStorage(NOTES_KEY);
-                            const combinedNotes = [...existingNotes, ...importedNotes];
-                            saveToStorage(NOTES_KEY, combinedNotes);
-                            alert("Notes imported successfully!");
-                            if (document.getElementById('notes-page').classList.contains('active')) {
-                                renderNotes();
-                            }
-                        }
-                    } catch (error) {
-                        alert("Failed to import notes. The file might be corrupted or in the wrong format.\n" + error.message);
-                    }
-                };
-                reader.readAsText(file);
-                importFileInput.value = '';
-            }
-            exportBtn.addEventListener('click', exportNotes);
-            importBtn.addEventListener('click', importNotes);
-            importFileInput.addEventListener('change', handleImportFile);
-            showPage('home-page');
-        });
-    </script>
-</body>
-</html>
+                const file = event.targe
