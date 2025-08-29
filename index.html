@@ -41,7 +41,8 @@
             <button id="mic-btn" class="w-32 h-32 bg-blue-600 hover:bg-blue-700 text-white rounded-full flex items-center justify-center shadow-lg transition-all duration-200">
                 <svg class="w-12 h-12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.49 6-3.31 6-6.72h-1.7z"/></svg>
             </button>
-            <div id="live-transcription" class="mt-8 text-lg text-gray-700 min-h-[50px] w-full max-w-2xl bg-white p-4 rounded-lg shadow-md"></div>
+            <!-- *** FIXED: Added max-h-64, overflow-y-auto, break-words and custom-scrollbar classes *** -->
+            <div id="live-transcription" class="mt-8 text-lg text-left text-gray-700 min-h-[50px] max-h-64 overflow-y-auto break-words w-full max-w-2xl bg-white p-4 rounded-lg shadow-md custom-scrollbar"></div>
         </div>
 
         <!-- Page 2: Notes -->
@@ -119,7 +120,6 @@
             let mediaRecorder;
             let audioChunks = [];
             let currentEditingNoteId = null;
-            let wakeLock = null; // *** ADDED: For Wake Lock API ***
 
             // --- DOM ELEMENTS ---
             const pages = document.querySelectorAll('.page');
@@ -247,18 +247,6 @@
             
             const startRecording = async () => {
                 try {
-                    // *** ADDED: Request a Wake Lock to keep the screen on ***
-                    if ('wakeLock' in navigator) {
-                        try {
-                            wakeLock = await navigator.wakeLock.request('screen');
-                            console.log('Wake Lock is active!');
-                            liveTranscriptionDiv.textContent = 'Screen will stay on during recording...';
-                        } catch (err) {
-                            console.error(`Wake Lock failed: ${err.name}, ${err.message}`);
-                            liveTranscriptionDiv.textContent = 'Could not prevent screen from sleeping.';
-                        }
-                    }
-
                     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
                     isRecording = true;
                     micButton.classList.add('bg-red-500', 'pulse-red');
@@ -295,14 +283,6 @@
                     isRecording = false;
                     micButton.classList.remove('bg-red-500', 'pulse-red');
                     micButton.classList.add('bg-blue-600');
-                    
-                    // *** ADDED: Release the Wake Lock ***
-                    if (wakeLock !== null) {
-                        wakeLock.release().then(() => {
-                            wakeLock = null;
-                            console.log('Wake Lock released.');
-                        });
-                    }
                 }
             };
 
@@ -416,7 +396,6 @@
                  history.forEach(item => {
                     const el = document.createElement('div');
                     el.className = 'bg-white p-3 rounded-md shadow-sm flex justify-between items-center';
-                    
                     el.innerHTML = `
                         <div class="flex-1 min-w-0 mr-4">
                             <p class="text-sm text-gray-700 truncate">${item.content}</p>
