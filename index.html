@@ -41,7 +41,6 @@
             <button id="mic-btn" class="w-32 h-32 bg-blue-600 hover:bg-blue-700 text-white rounded-full flex items-center justify-center shadow-lg transition-all duration-200">
                 <svg class="w-12 h-12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.49 6-3.31 6-6.72h-1.7z"/></svg>
             </button>
-            <!-- *** FIXED: Added max-h-64, overflow-y-auto, break-words and custom-scrollbar classes *** -->
             <div id="live-transcription" class="mt-8 text-lg text-left text-gray-700 min-h-[50px] max-h-64 overflow-y-auto break-words w-full max-w-2xl bg-white p-4 rounded-lg shadow-md custom-scrollbar"></div>
         </div>
 
@@ -120,6 +119,7 @@
             let mediaRecorder;
             let audioChunks = [];
             let currentEditingNoteId = null;
+            let wakeLock = null; // *** ADDED: For Wake Lock API ***
 
             // --- DOM ELEMENTS ---
             const pages = document.querySelectorAll('.page');
@@ -178,7 +178,6 @@
                 };
             };
             
-            // Generic modal event listener
             modalContainer.addEventListener('click', (e) => {
                 if (e.target === modalContainer || e.target.closest('.modal-close') || e.target.closest('.modal-cancel')) {
                     hideModal();
@@ -189,14 +188,11 @@
             const showPage = (pageId) => {
                 pages.forEach(p => p.classList.add('hidden'));
                 document.getElementById(pageId).classList.remove('hidden');
-
                 navItems.forEach(item => {
                     const isActive = item.dataset.page === pageId;
                     item.classList.toggle('text-blue-600', isActive);
                     item.classList.toggle('text-gray-500', !isActive);
                 });
-                
-                // Refresh content on page show
                 if (pageId === 'notes-page') renderNotes();
                 if (pageId === 'history-page') renderHistory();
             };
@@ -216,6 +212,30 @@
             };
             if (getApiKey()) { apiKeyInput.value = '********'; }
             saveKeyBtn.addEventListener('click', saveApiKey);
+
+            // *** ADDED: Wake Lock Functions ***
+            const requestWakeLock = async () => {
+                if ('wakeLock' in navigator) {
+                    try {
+                        wakeLock = await navigator.wakeLock.request('screen');
+                        console.log('Screen Wake Lock is active.');
+                    } catch (err) {
+                        console.error(`Wake Lock Error: ${err.name}, ${err.message}`);
+                    }
+                }
+            };
+
+            const releaseWakeLock = async () => {
+                if (wakeLock !== null) {
+                    try {
+                        await wakeLock.release();
+                        wakeLock = null;
+                        console.log('Screen Wake Lock released.');
+                    } catch (err) {
+                         console.error(`Wake Lock Release Error: ${err.name}, ${err.message}`);
+                    }
+                }
+            };
 
 
             // --- TRANSCRIPTION LOGIC ---
@@ -248,6 +268,8 @@
             const startRecording = async () => {
                 try {
                     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    await requestWakeLock(); // *** ADDED: Request wake lock ***
+
                     isRecording = true;
                     micButton.classList.add('bg-red-500', 'pulse-red');
                     micButton.classList.remove('bg-blue-600');
@@ -256,10 +278,24 @@
                     mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
                     mediaRecorder.start();
 
+                    // *** ADDED: Handle interruptions like phone calls ***
+                    stream.getTracks().forEach(track => {
+                        track.onended = () => {
+                            console.log('Audio track ended, possibly due to an interruption.');
+                            if (isRecording) {
+                                showAlert('Recording was interrupted. Saving the recorded part.', 'info');
+                                stopRecording();
+                            }
+                        };
+                    });
+
                     mediaRecorder.ondataavailable = (event) => audioChunks.push(event.data);
                     
                     mediaRecorder.onstop = async () => {
+                        releaseWakeLock(); // *** ADDED: Release wake lock on stop ***
                         stream.getTracks().forEach(track => track.stop());
+                        if(audioChunks.length === 0) return;
+
                         const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
                         const text = await transcribeAudioWithGemini(audioBlob);
                         if (text) {
@@ -274,6 +310,7 @@
                 } catch (err) {
                     console.error("Microphone error:", err);
                     showAlert("Microphone access was denied or an error occurred.", 'error');
+                    releaseWakeLock(); // *** ADDED: Release wake lock on error ***
                 }
             };
 
@@ -283,6 +320,7 @@
                     isRecording = false;
                     micButton.classList.remove('bg-red-500', 'pulse-red');
                     micButton.classList.add('bg-blue-600');
+                    // Wake lock is released in mediaRecorder.onstop
                 }
             };
 
@@ -291,13 +329,13 @@
             // --- NOTE & HISTORY MANAGEMENT ---
             const saveNote = (content, id = null) => {
                 let notes = getFromStorage(NOTES_KEY);
-                if (id) { // Update existing note
+                if (id) {
                     const index = notes.findIndex(n => n.id === id);
                     if (index > -1) {
                         notes[index].content = content;
                         notes[index].title = content.substring(0, 40) + (content.length > 40 ? '...' : '');
                     }
-                } else { // Create new note
+                } else {
                     const newNote = { id: Date.now(), title: content.substring(0, 40) + '...', content: content, createdAt: new Date().toISOString() };
                     notes.unshift(newNote);
                 }
@@ -306,11 +344,10 @@
             
             const saveHistory = (content) => {
                 let history = getFromStorage(HISTORY_KEY);
-                // Keep history for 24 hours
                 const oneDayAgo = Date.now() - (24 * 60 * 60 * 1000);
                 history = history.filter(item => new Date(item.createdAt).getTime() > oneDayAgo);
                 history.unshift({ id: Date.now(), content: content, createdAt: new Date().toISOString() });
-                saveToStorage(HISTORY_KEY, history.slice(0, 50)); // Limit history size
+                saveToStorage(HISTORY_KEY, history.slice(0, 50));
             };
 
             const deleteNote = (id) => {
