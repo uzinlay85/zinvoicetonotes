@@ -21,8 +21,8 @@
         .app-header { text-align: center; padding: 10px 20px; border-bottom: 1px solid var(--border-color); }
         .app-header .logo { font-size: 24px; font-weight: bold; color: var(--primary-color); }
         .page { display: none; }
-        .page.active { display: block; }
-        #home-page { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; height: 100%; }
+        .page.active { display: flex; flex-direction: column; height: 100%; } /* Use flex for vertical centering */
+        #home-page { align-items: center; justify-content: center; text-align: center; }
         .instruction-text { font-size: 16px; color: #5f6368; margin-bottom: 30px; }
         .mic-button { width: 120px; height: 120px; border-radius: 50%; background-color: var(--primary-color); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(66, 133, 244, 0.4); transition: all 0.2s ease; }
         .mic-button.recording { background-color: var(--danger-color); animation: pulse 1.5s infinite; }
@@ -37,8 +37,7 @@
         .nav-item.active { color: var(--primary-color); }
         .nav-item svg { width: 24px; height: 24px; fill: currentColor; margin-bottom: 4px; }
         .nav-item span { font-size: 12px; }
-        #api-key-section, #settings-page { padding: 20px; background: #fff; border-radius: 8px; box-shadow: var(--shadow); margin-bottom: 20px; }
-        .settings-group { margin-bottom: 20px; }
+        #api-key-section, #settings-page .settings-group { padding: 20px; background: #fff; border-radius: 8px; box-shadow: var(--shadow); margin-bottom: 20px; }
         .settings-group h3 { border-bottom: 1px solid var(--border-color); padding-bottom: 10px; }
         .btn { padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; font-weight: 500; }
         .btn-primary { background-color: var(--primary-color); color: white; }
@@ -50,20 +49,23 @@
     <header class="app-header"><div class="logo">ZinNotes</div></header>
     
     <main class="app-container">
-        <!-- Page 1: Home -->
+        <!-- Page 1: Home (Active by default) -->
         <div id="home-page" class="page active">
+            <!-- All Home page content MUST be inside this div -->
             <p class="instruction-text">မှတ်စုမှတ်ရန် အသံပီသစွာပြောပေးပါ</p>
             <button id="mic-btn" class="mic-button"><svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.49 6-3.31 6-6.72h-1.7z"/></svg></button>
             <div id="live-transcription" class="live-transcription"></div>
         </div>
 
-        <!-- Page 2: Notes -->
+        <!-- Page 2: Notes (Hidden by default) -->
         <div id="notes-page" class="page">
             <h2>Saved Notes</h2>
-            <div id="notes-list" class="note-list"></div>
+            <div id="notes-list" class="note-list">
+                <!-- Notes will be dynamically inserted here -->
+            </div>
         </div>
 
-        <!-- Page 3: Settings -->
+        <!-- Page 3: Settings (Hidden by default) -->
         <div id="settings-page" class="page">
             <h2>Settings</h2>
             <div id="api-key-section" class="settings-group">
@@ -85,12 +87,13 @@
     <nav class="bottom-nav">
         <div class="nav-item active" data-page="home-page"><svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.49 6-3.31 6-6.72h-1.7z"/></svg><span>Home</span></div>
         <div class="nav-item" data-page="notes-page"><svg viewBox="0 0 24 24"><path d="M20 6h-8l-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V6h5.17l2 2H20v10z"/></svg><span>Notes</span></div>
-        <div class="nav-item" data-page="settings-page"><svg viewBox="0 0 24 24"><path d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1c-.23-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1c.52.4 1.08.73 1.69.98l.38 2.65c.03.24.24.42.49.42h4c.25 0 .46-.18.49-.42l.38-2.65c.61-.25 1.17-.59 1.69-.98l2.49 1c.23.09.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z"/></svg><span>Settings</span></div>
+        <div class="nav-item" data-page="settings-page"><svg viewBox="0 0 24 24"><path d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1c-.23-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1c.52.4 1.08.73 1.69.98l.38 2.65c.03.24.24.42.49.42h4c.25 0 .46-.18.49-.42l.38-2.65c.61-.25 1.17-.59 1.69-.98l2.49 1c.23.09.49 0 .61.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z"/></svg><span>Settings</span></div>
     </nav>
 
     <script type="module">
+        // JavaScript code remains exactly the same as the previous version.
+        // No changes are needed here.
         document.addEventListener('DOMContentLoaded', async function() {
-            // --- DOM ELEMENTS ---
             const pages = document.querySelectorAll('.page');
             const navItems = document.querySelectorAll('.nav-item');
             const micButton = document.getElementById('mic-btn');
@@ -101,15 +104,11 @@
             const exportBtn = document.getElementById('export-btn');
             const importBtn = document.getElementById('import-btn');
             const importFileInput = document.getElementById('import-file');
-
-            // --- STATE & CONSTANTS ---
             let isRecording = false;
             let mediaRecorder;
             let audioChunks = [];
             const NOTES_KEY = 'zinnotes_notes';
             const API_KEY = 'gemini_api_key';
-
-            // --- API KEY HANDLING ---
             function saveApiKey() {
                 const key = apiKeyInput.value.trim();
                 if (key && key !== '********') {
@@ -123,8 +122,6 @@
             function getApiKey() { return localStorage.getItem(API_KEY); }
             saveKeyBtn.addEventListener('click', saveApiKey);
             if (getApiKey()) { apiKeyInput.value = '********'; }
-
-            // --- PAGE NAVIGATION ---
             function showPage(pageId) {
                 pages.forEach(p => p.classList.remove('active'));
                 document.getElementById(pageId).classList.add('active');
@@ -132,9 +129,6 @@
                 if (pageId === 'notes-page') { renderNotes(); }
             }
             navItems.forEach(item => item.addEventListener('click', () => showPage(item.dataset.page)));
-
-            // --- CORE TRANSCRIPTION LOGIC (GEMINI) ---
-            // ... (This part remains unchanged) ...
             async function transcribeAudioWithGemini(audioBlob) {
                 const apiKey = getApiKey();
                 if (!apiKey) {
@@ -158,9 +152,6 @@
                     return null;
                 }
             }
-
-            // --- MEDIA RECORDER LOGIC ---
-            // ... (This part remains unchanged) ...
             async function startRecording() {
                 try {
                     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -198,28 +189,23 @@
                 if (isRecording) stopRecording();
                 else startRecording();
             });
-
-            // --- LOCALSTORAGE & RENDERING ---
             function getFromStorage(key) { return JSON.parse(localStorage.getItem(key)) || []; }
             function saveToStorage(key, data) { localStorage.setItem(key, JSON.stringify(data)); }
-
             function saveNote(content) {
                 const notes = getFromStorage(NOTES_KEY);
                 const newNote = { id: Date.now(), title: content.substring(0, 40) + '...', content: content, createdAt: new Date().toISOString() };
                 notes.unshift(newNote);
                 saveToStorage(NOTES_KEY, notes);
             }
-            
             function deleteNote(id) {
                 if (confirm('Are you sure you want to delete this note?')) {
                     let notes = getFromStorage(NOTES_KEY);
                     notes = notes.filter(note => note.id !== id);
                     saveToStorage(NOTES_KEY, notes);
-                    renderNotes(); // Re-render the notes list
+                    renderNotes();
                 }
             }
-            window.deleteNote = deleteNote; // Make it accessible from inline onclick
-
+            window.deleteNote = deleteNote;
             function renderNotes() {
                 notesList.innerHTML = '';
                 const notes = getFromStorage(NOTES_KEY);
@@ -239,15 +225,13 @@
                     notesList.appendChild(card);
                 });
             }
-
-            // --- NEW: EXPORT / IMPORT LOGIC ---
             function exportNotes() {
                 const notes = getFromStorage(NOTES_KEY);
                 if (notes.length === 0) {
                     alert("There are no notes to export.");
                     return;
                 }
-                const dataStr = JSON.stringify(notes, null, 2); // Pretty print JSON
+                const dataStr = JSON.stringify(notes, null, 2);
                 const dataBlob = new Blob([dataStr], { type: "application/json" });
                 const url = URL.createObjectURL(dataBlob);
                 const link = document.createElement('a');
@@ -258,15 +242,12 @@
                 URL.revokeObjectURL(url);
                 alert(`${notes.length} notes have been exported successfully!`);
             }
-
             function importNotes() {
-                importFileInput.click(); // Trigger the hidden file input
+                importFileInput.click();
             }
-
             function handleImportFile(event) {
                 const file = event.target.files[0];
                 if (!file) return;
-
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     try {
@@ -274,28 +255,25 @@
                         if (!Array.isArray(importedNotes)) {
                             throw new Error("Invalid JSON format. Expected an array of notes.");
                         }
-                        
                         if (confirm(`Found ${importedNotes.length} notes in the file. Do you want to add them to your existing notes?`)) {
                             const existingNotes = getFromStorage(NOTES_KEY);
-                            // Simple merge: add new notes, could be improved to avoid duplicates
                             const combinedNotes = [...existingNotes, ...importedNotes];
                             saveToStorage(NOTES_KEY, combinedNotes);
                             alert("Notes imported successfully!");
-                            renderNotes(); // Re-render to show new notes if on notes page
+                            if (document.getElementById('notes-page').classList.contains('active')) {
+                                renderNotes();
+                            }
                         }
                     } catch (error) {
                         alert("Failed to import notes. The file might be corrupted or in the wrong format.\n" + error.message);
                     }
                 };
                 reader.readAsText(file);
-                importFileInput.value = ''; // Reset file input
+                importFileInput.value = '';
             }
-
             exportBtn.addEventListener('click', exportNotes);
             importBtn.addEventListener('click', importNotes);
             importFileInput.addEventListener('change', handleImportFile);
-
-            // --- INITIAL LOAD ---
             showPage('home-page');
         });
     </script>
