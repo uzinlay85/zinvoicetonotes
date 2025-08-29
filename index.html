@@ -25,7 +25,6 @@
         .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #555; }
     </style>
 </head>
-<!-- *** FIXED: Removed 'overflow-hidden' to allow main content to scroll properly *** -->
 <body class="bg-gray-100 text-gray-800 flex flex-col h-screen">
 
     <header class="bg-white shadow-md">
@@ -229,8 +228,13 @@
                     const result = await model.generateContent(["Transcribe this audio from Myanmar (Burmese) language.", audioPart]);
                     return result.response.text();
                 } catch (error) {
+                    // *** MODIFIED: Better error handling for Quota Exceeded ***
                     console.error("Error with Gemini API:", error);
-                    showAlert(`Error during transcription: ${error.message}`, 'error');
+                    if (error.message && error.message.includes('429')) {
+                         showAlert("API Quota Error: သင်၏ API Key အတွက် Pro model အခမဲ့အသုံးပြုခွင့်ကုန်သွားပါပြီ။ Setting တွင် Flash model သို့ ပြန်ပြောင်းပါ သို့မဟုတ် Google AI Studio တွင် Billing ပြုလုပ်ပါ။", 'error');
+                    } else {
+                        showAlert(`Error during transcription: ${error.message}`, 'error');
+                    }
                     return null;
                 }
             };
