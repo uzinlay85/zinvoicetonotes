@@ -38,7 +38,6 @@
         <!-- Page 1: Home -->
         <div id="home-page" class="page flex flex-col items-center justify-center text-center h-full">
             <p class="text-lg text-gray-600 mb-4">မှတ်စုမှတ်ရန် အသံပီသစွာပြောပေးပါ</p>
-            <!-- *** ADDED: Timer Display *** -->
             <div id="timer-display" class="text-2xl text-gray-800 font-mono mb-4 h-8"></div>
             <button id="mic-btn" class="w-32 h-32 bg-blue-600 hover:bg-blue-700 text-white rounded-full flex items-center justify-center shadow-lg transition-all duration-200">
                 <svg class="w-12 h-12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.49 6-3.31 6-6.72h-1.7z"/></svg>
@@ -90,6 +89,16 @@
                     <button id="import-btn" class="flex-1 bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700">Import Notes</button>
                 </div>
             </div>
+            <!-- *** ADDED: Contact Information Section *** -->
+            <div class="bg-white p-5 rounded-lg shadow-md mt-6">
+                <h3 class="text-lg font-semibold border-b pb-2 mb-4">အကြံပြုရန် နှင့် ဆက်သွယ်ရန်</h3>
+                <p class="text-sm text-gray-600">
+                    App နှင့်ပက်သက်ပြီး အကြံပေးလိုပါက Telegram မှတစ်ဆင့် ဆက်သွယ်နိုင်ပါသည်။
+                </p>
+                <a href="https://t.me/upanna2" target="_blank" class="mt-3 inline-block text-blue-600 hover:underline">
+                    ဆက်သွယ်ရန်: @upanna2
+                </a>
+            </div>
         </div>
     </main>
 
@@ -133,7 +142,6 @@
             let audioChunks = [];
             let currentEditingNoteId = null;
             let wakeLock = null; 
-            // *** ADDED: Timer variables ***
             let timerInterval = null;
             let secondsElapsed = 0;
 
@@ -152,7 +160,7 @@
             const modalContainer = document.getElementById('modal-container');
             const modalContent = document.getElementById('modal-content');
             const modelSelect = document.getElementById('model-select');
-            const timerDisplay = document.getElementById('timer-display'); // *** ADDED: Timer Display element ***
+            const timerDisplay = document.getElementById('timer-display'); 
 
             // --- UTILITY FUNCTIONS ---
             const getFromStorage = (key) => JSON.parse(localStorage.getItem(key)) || [];
@@ -266,7 +274,7 @@
                 }
             };
 
-            // *** ADDED: Timer Functions ***
+            // --- TIMER FUNCTIONS ---
             const startTimer = () => {
                 secondsElapsed = 0;
                 timerDisplay.textContent = '00:00';
@@ -314,10 +322,15 @@
             };
             
             const startRecording = async () => {
+                if (!getApiKey()) {
+                    showAlert("API Key မထည့်သွင်းရသေးပါ။ Settings သို့သွား၍ API Key ထည့်သွင်းပေးပါ။", 'error');
+                    return;
+                }
+
                 try {
                     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
                     await requestWakeLock(); 
-                    startTimer(); // *** MODIFIED: Start timer ***
+                    startTimer(); 
 
                     isRecording = true;
                     micButton.classList.add('bg-red-500', 'pulse-red');
@@ -341,7 +354,7 @@
                     
                     mediaRecorder.onstop = async () => {
                         releaseWakeLock(); 
-                        stopTimer(); // *** MODIFIED: Stop timer ***
+                        stopTimer(); 
                         stream.getTracks().forEach(track => track.stop());
                         if(audioChunks.length === 0) return;
 
@@ -360,7 +373,7 @@
                     console.error("Microphone error:", err);
                     showAlert("Microphone access was denied or an error occurred.", 'error');
                     releaseWakeLock();
-                    stopTimer(); // *** MODIFIED: Stop timer on error ***
+                    stopTimer();
                 }
             };
 
@@ -370,7 +383,6 @@
                     isRecording = false;
                     micButton.classList.remove('bg-red-500', 'pulse-red');
                     micButton.classList.add('bg-blue-600');
-                    // Timer is stopped in mediaRecorder.onstop
                 }
             };
 
