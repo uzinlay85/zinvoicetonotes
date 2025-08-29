@@ -25,7 +25,8 @@
         .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #555; }
     </style>
 </head>
-<body class="bg-gray-100 text-gray-800 flex flex-col h-screen overflow-hidden">
+<!-- *** FIXED: Removed 'overflow-hidden' to allow main content to scroll properly *** -->
+<body class="bg-gray-100 text-gray-800 flex flex-col h-screen">
 
     <header class="bg-white shadow-md">
         <div class="max-w-4xl mx-auto py-3 px-4">
@@ -69,7 +70,6 @@
                 </div>
             </div>
 
-            <!-- *** ADDED: Model Selection Setting *** -->
             <div class="bg-white p-5 rounded-lg shadow-md">
                 <h3 class="text-lg font-semibold border-b pb-2 mb-4">Model Selection</h3>
                 <label for="model-select" class="block text-sm font-medium text-gray-700">Choose transcription model:</label>
@@ -126,7 +126,7 @@
             const NOTES_KEY = 'zinnotes_notes';
             const HISTORY_KEY = 'zinnotes_history';
             const API_KEY = 'gemini_api_key';
-            const MODEL_KEY = 'zinnotes_selected_model'; // *** ADDED ***
+            const MODEL_KEY = 'zinnotes_selected_model';
             let isRecording = false;
             let mediaRecorder;
             let audioChunks = [];
@@ -145,7 +145,7 @@
             const exportBtn = document.getElementById('export-btn');
             const importBtn = document.getElementById('import-btn');
             const importFileInput = document.getElementById('import-file');
-            const modelSelect = document.getElementById('model-select'); // *** ADDED ***
+            const modelSelect = document.getElementById('model-select');
             const modalContainer = document.getElementById('modal-container');
             const modalContent = document.getElementById('modal-content');
 
@@ -196,7 +196,6 @@
             if (getApiKey()) { apiKeyInput.value = '********'; }
             saveKeyBtn.addEventListener('click', saveApiKey);
             
-            // *** ADDED: Model Selection Logic ***
             const loadModelSelection = () => {
                 const savedModel = localStorage.getItem(MODEL_KEY) || 'gemini-1.5-flash';
                 modelSelect.value = savedModel;
@@ -219,7 +218,7 @@
                 
                 try {
                     const genAI = new window.GoogleGenerativeAI(apiKey);
-                    const selectedModel = localStorage.getItem(MODEL_KEY) || 'gemini-1.5-flash'; // *** MODIFIED: Use selected model ***
+                    const selectedModel = localStorage.getItem(MODEL_KEY) || 'gemini-1.5-flash';
                     const model = genAI.getGenerativeModel({ model: selectedModel });
                     
                     const reader = new FileReader();
@@ -337,7 +336,7 @@
 
             // --- INITIAL LOAD ---
             showPage('home-page');
-            loadModelSelection(); // *** ADDED ***
+            loadModelSelection();
         });
     </script>
 </body>
