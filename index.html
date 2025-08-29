@@ -119,6 +119,7 @@
             let mediaRecorder;
             let audioChunks = [];
             let currentEditingNoteId = null;
+            let wakeLock = null; // *** ADDED: For Wake Lock API ***
 
             // --- DOM ELEMENTS ---
             const pages = document.querySelectorAll('.page');
@@ -246,6 +247,18 @@
             
             const startRecording = async () => {
                 try {
+                    // *** ADDED: Request a Wake Lock to keep the screen on ***
+                    if ('wakeLock' in navigator) {
+                        try {
+                            wakeLock = await navigator.wakeLock.request('screen');
+                            console.log('Wake Lock is active!');
+                            liveTranscriptionDiv.textContent = 'Screen will stay on during recording...';
+                        } catch (err) {
+                            console.error(`Wake Lock failed: ${err.name}, ${err.message}`);
+                            liveTranscriptionDiv.textContent = 'Could not prevent screen from sleeping.';
+                        }
+                    }
+
                     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
                     isRecording = true;
                     micButton.classList.add('bg-red-500', 'pulse-red');
@@ -282,6 +295,14 @@
                     isRecording = false;
                     micButton.classList.remove('bg-red-500', 'pulse-red');
                     micButton.classList.add('bg-blue-600');
+                    
+                    // *** ADDED: Release the Wake Lock ***
+                    if (wakeLock !== null) {
+                        wakeLock.release().then(() => {
+                            wakeLock = null;
+                            console.log('Wake Lock released.');
+                        });
+                    }
                 }
             };
 
@@ -396,7 +417,6 @@
                     const el = document.createElement('div');
                     el.className = 'bg-white p-3 rounded-md shadow-sm flex justify-between items-center';
                     
-                    // *** FIXED: Added flex-1 and min-w-0 to the text container and flex-shrink-0 to the button ***
                     el.innerHTML = `
                         <div class="flex-1 min-w-0 mr-4">
                             <p class="text-sm text-gray-700 truncate">${item.content}</p>
