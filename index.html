@@ -30,8 +30,12 @@
         @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(234, 67, 53, 0.7); } 70% { box-shadow: 0 0 0 20px rgba(234, 67, 53, 0); } 100% { box-shadow: 0 0 0 0 rgba(234, 67, 53, 0); } }
         .live-transcription { margin-top: 30px; font-size: 18px; color: #3c4043; min-height: 50px; width: 90%; max-width: 600px; background: #fff; padding: 15px; border-radius: 8px; box-shadow: var(--shadow); }
         .note-list { display: flex; flex-direction: column; gap: 15px; }
-        .note-card { background-color: var(--card-bg-color); border-radius: 12px; padding: 15px 20px; box-shadow: var(--shadow); cursor: pointer; transition: transform 0.2s ease; position: relative; }
-        .delete-btn { position: absolute; top: 10px; right: 10px; background: var(--danger-color); color: white; border: none; border-radius: 50%; width: 24px; height: 24px; cursor: pointer; font-weight: bold; display: flex; align-items: center; justify-content: center; }
+        .note-card { background-color: var(--card-bg-color); border-radius: 12px; padding: 15px; box-shadow: var(--shadow); cursor: pointer; transition: transform 0.2s ease; position: relative; }
+        .note-card-actions { position: absolute; top: 10px; right: 10px; display: flex; gap: 8px; }
+        .action-btn { background: #eee; color: #333; border: none; border-radius: 50%; width: 28px; height: 28px; cursor: pointer; font-weight: bold; display: flex; align-items: center; justify-content: center; transition: background-color 0.2s; }
+        .action-btn:hover { background: #ddd; }
+        .delete-btn { background-color: var(--danger-color); color: white; }
+        .delete-btn:hover { background-color: #c5372a; }
         .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 65px; background-color: var(--card-bg-color); display: flex; justify-content: space-around; align-items: center; box-shadow: 0 -2px 10px rgba(0,0,0,0.07); border-top: 1px solid var(--border-color); }
         .nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; color: #5f6368; transition: color 0.2s ease; flex-grow: 1; height: 100%; }
         .nav-item.active { color: var(--primary-color); }
@@ -46,7 +50,6 @@
         .api-key-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
         .api-key-guide { font-size: 12px; color: #5f6368; margin-top: 15px; }
         .api-key-guide a { color: var(--primary-color); text-decoration: none; }
-        .api-key-guide a:hover { text-decoration: underline; }
     </style>
 </head>
 <body>
@@ -73,12 +76,8 @@
                 <h3>API Configuration</h3>
                 <label for="api-key-input">Your Gemini API Key:</label>
                 <input type="password" id="api-key-input" placeholder="Enter your API Key here">
-                
-                <!-- *** NEW: API Key Guide and Actions *** -->
                 <div class="api-key-actions">
-                    <p class="api-key-guide">
-                        API Key မရှိသေးပါက <a href="https://aistudio.google.com/app/apikey" target="_blank">Google AI Studio</a> တွင် အခမဲ့ ရယူနိုင်ပါသည်။
-                    </p>
+                    <p class="api-key-guide">API Key မရှိသေးပါက <a href="https://aistudio.google.com/app/apikey" target="_blank">Google AI Studio</a> တွင် အခမဲ့ ရယူနိုင်ပါသည်။</p>
                     <button id="save-key-btn" class="btn btn-primary">Save</button>
                 </div>
             </div>
@@ -95,12 +94,12 @@
     <nav class="bottom-nav">
         <div class="nav-item active" data-page="home-page"><svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.49 6-3.31 6-6.72h-1.7z"/></svg><span>Home</span></div>
         <div class="nav-item" data-page="notes-page"><svg viewBox="0 0 24 24"><path d="M20 6h-8l-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V6h5.17l2 2H20v10z"/></svg><span>Notes</span></div>
-        <div class="nav-item" data-page="settings-page"><svg viewBox="0 0 24 24"><path d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1c-.23-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1c.52.4 1.08.73 1.69.98l.38 2.65c.03.24.24.42.49.42h4c.25 0 .46-.18.49.42l.38-2.65c.61-.25 1.17-.59 1.69-.98l2.49 1c.23.09.49 0 .61.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z"/></svg><span>Settings</span></div>
+        <div class="nav-item" data-page="settings-page"><svg viewBox="0 0 24 24"><path d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61.25-1.17.59-1.69-.98l-2.49-1c-.23-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1c.52.4 1.08.73 1.69-.98l.38 2.65c.03.24.24.42.49.42h4c.25 0 .46-.18.49.42l.38-2.65c.61-.25 1.17-.59 1.69-.98l2.49 1c.23.09.49 0 .61.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z"/></svg><span>Settings</span></div>
     </nav>
 
     <script type="module">
-        // JavaScript code remains exactly the same. No changes needed.
         document.addEventListener('DOMContentLoaded', async function( ) {
+            // ... (other variables remain the same) ...
             const pages = document.querySelectorAll('.page');
             const navItems = document.querySelectorAll('.nav-item');
             const micButton = document.getElementById('mic-btn');
@@ -204,6 +203,18 @@
                 notes.unshift(newNote);
                 saveToStorage(NOTES_KEY, notes);
             }
+            
+            // --- NEW: copyNote function ---
+            function copyNote(content) {
+                navigator.clipboard.writeText(content).then(() => {
+                    alert("Note copied to clipboard!");
+                }).catch(err => {
+                    console.error('Failed to copy text: ', err);
+                    alert("Could not copy note. Please try again.");
+                });
+            }
+            window.copyNote = copyNote; // Make it globally accessible
+
             function deleteNote(id) {
                 if (confirm('Are you sure you want to delete this note?')) {
                     let notes = getFromStorage(NOTES_KEY);
@@ -213,6 +224,7 @@
                 }
             }
             window.deleteNote = deleteNote;
+
             function renderNotes() {
                 notesList.innerHTML = '';
                 const notes = getFromStorage(NOTES_KEY);
@@ -223,11 +235,39 @@
                 notes.forEach(note => {
                     const card = document.createElement('div');
                     card.className = 'note-card';
-                    card.innerHTML = `
-                        <button class="delete-btn" onclick="event.stopPropagation(); window.deleteNote(${note.id})">X</button>
-                        <h3>${note.title}</h3>
-                        <p>${note.content}</p>
-                    `;
+                    
+                    // Use textContent to prevent XSS issues when inserting note content into the onclick attribute
+                    const copyBtn = document.createElement('button');
+                    copyBtn.className = 'action-btn';
+                    copyBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>`;
+                    copyBtn.onclick = (e) => {
+                        e.stopPropagation();
+                        copyNote(note.content);
+                    };
+
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.className = 'action-btn delete-btn';
+                    deleteBtn.textContent = 'X';
+                    deleteBtn.onclick = (e) => {
+                        e.stopPropagation();
+                        deleteNote(note.id);
+                    };
+
+                    const actionsDiv = document.createElement('div');
+                    actionsDiv.className = 'note-card-actions';
+                    actionsDiv.appendChild(copyBtn);
+                    actionsDiv.appendChild(deleteBtn);
+
+                    const titleH3 = document.createElement('h3');
+                    titleH3.textContent = note.title;
+                    
+                    const contentP = document.createElement('p');
+                    contentP.textContent = note.content;
+
+                    card.appendChild(actionsDiv);
+                    card.appendChild(titleH3);
+                    card.appendChild(contentP);
+
                     card.onclick = () => alert(note.content);
                     notesList.appendChild(card);
                 });
