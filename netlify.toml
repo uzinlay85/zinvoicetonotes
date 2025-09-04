@@ -1,15 +1,5 @@
-# This is the final and most robust configuration for your site.
+# This is a simplified and direct configuration for your site.
 [build]
 
-# This tells Netlify that your index.html is in the root directory.
-publish = "."
-
-# This tells Netlify where your functions are.
+# This tells Netlify that your functions are in a folder named "functions".
 functions = "functions"
-
-# This redirect rule makes your function accessible at a cleaner URL (/api/saveToNotion)
-# and helps solve routing issues.
-[[redirects]]
-from = "/api/*"
-to = "/.netlify/functions/:splat"
-status = 200
