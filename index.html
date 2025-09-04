@@ -44,7 +44,7 @@
                     <svg class="w-12 h-12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.49 6-3.31 6-6.72h-1.7z"/></svg>
                 </button>
                 
-                <!-- NEW FEATURE: File Upload Button -->
+                <!-- File Upload Button -->
                 <input type="file" id="audio-upload-input" class="hidden" accept="audio/*">
                 <button id="audio-upload-btn" class="flex items-center space-x-2 bg-white hover:bg-gray-200 text-gray-700 font-semibold py-2 px-6 border border-gray-300 rounded-full shadow-sm transition-all duration-200">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
@@ -188,8 +188,6 @@
             const notionKeyInput = document.getElementById('notion-key-input');
             const notionDbIdInput = document.getElementById('notion-db-id-input');
             const saveUserNotionSettingsBtn = document.getElementById('save-user-notion-settings-btn');
-            
-            // NEW FEATURE: Get new DOM elements for file upload
             const audioUploadBtn = document.getElementById('audio-upload-btn');
             const audioUploadInput = document.getElementById('audio-upload-input');
 
@@ -293,14 +291,15 @@
 
             // TRANSCRIPTION LOGIC
             const transcribeAudioWithGemini = async (audioBlob) => {
-                const apiKey = getApiKey();
-                if (!apiKey) {
-                    showAlert("Please save your Gemini API Key in Settings.", 'error');
-                    return null;
-                }
-                liveTranscriptionDiv.textContent = 'Transcribing with Gemini...';
+                // MODIFIED: This message is now more generic for both recording and file upload
+                liveTranscriptionDiv.innerHTML = `
+                    <div class="flex flex-col items-center justify-center text-gray-500">
+                        <svg class="animate-spin h-8 w-8 text-blue-500 mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                        <p>AI က စာသားအဖြစ် ပြောင်းနေပါသည်...</p>
+                    </div>
+                `;
                 try {
-                    const genAI = new GoogleGenerativeAI(apiKey);
+                    const genAI = new GoogleGenerativeAI(getApiKey());
                     const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
                     
                     const reader = new FileReader();
@@ -368,7 +367,7 @@
             };
             micButton.addEventListener('click', () => isRecording ? stopRecording() : startRecording());
 
-            // NEW FEATURE: Logic for handling file upload
+            // Logic for handling file upload
             audioUploadBtn.addEventListener('click', () => {
                 audioUploadInput.click();
             });
@@ -384,20 +383,29 @@
                     return;
                 }
 
-                liveTranscriptionDiv.textContent = 'Uploading and transcribing file...';
-                
-                const text = await transcribeAudioWithGemini(file);
-                
-                if (text) {
-                    liveTranscriptionDiv.textContent = text;
-                    saveNote(text);
-                    saveHistory(text);
-                    showAlert("File transcription complete and saved!", 'success');
-                } else {
-                    liveTranscriptionDiv.textContent = 'Could not transcribe file. Please try again.';
-                }
+                // NEW UI UPDATE: Show the selected file name immediately before processing.
+                liveTranscriptionDiv.innerHTML = `
+                    <div class="flex flex-col items-center justify-center text-gray-500">
+                        <svg class="w-8 h-8 mb-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <p class="font-semibold break-all">ဖိုင်: <span class="font-normal">${file.name}</span></p>
+                        <p class="text-sm">ဖိုင်တင်ပြီးပါပြီ။ ခေတ္တစောင့်ဆိုင်းပေးပါ...</p>
+                    </div>
+                `;
 
-                // Reset file input to allow uploading the same file again
+                // Use a short delay so the user can see the "File uploaded" message
+                setTimeout(async () => {
+                    const text = await transcribeAudioWithGemini(file);
+                
+                    if (text) {
+                        liveTranscriptionDiv.textContent = text;
+                        saveNote(text);
+                        saveHistory(text);
+                        showAlert("File transcription complete and saved!", 'success');
+                    } else {
+                        liveTranscriptionDiv.textContent = 'Could not transcribe file. Please try again.';
+                    }
+                }, 1000); // 1 second delay
+
                 event.target.value = '';
             });
 
@@ -586,3 +594,4 @@
     </script>
 </body>
 </html>
+
