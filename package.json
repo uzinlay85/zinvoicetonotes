@@ -2,8 +2,8 @@
   "name": "zinvoicetonotes",
   "version": "1.0.0",
   "dependencies": {
+    "@notionhq/client": "^2.2.14",
     "axios": "^0.24.0",
-    "notion-client": "^1.0.0",
-    "node-fetch": "^x.x.x"
+    "node-fetch": "^2.6.7" 
   }
 }
