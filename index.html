@@ -243,13 +243,15 @@
             const saveUserNotionSettings = () => {
                 const apiKey = notionApiKeyInput.value.trim();
                 const dbId = notionDatabaseIdInput.value.trim();
-                if (apiKey && dbId) {
+                if (apiKey && apiKey !== '********' && dbId) {
                     localStorage.setItem(NOTION_API_KEY, apiKey);
                     localStorage.setItem(NOTION_DATABASE_ID, dbId);
                     showAlert('Notion settings saved successfully!', 'success');
                     notionApiKeyInput.value = '********';
-                } else {
+                } else if (!dbId || !apiKey) {
                     showAlert('Please fill in both Notion API Key and Database ID.', 'error');
+                } else {
+                     showAlert('Notion settings saved successfully!', 'success');
                 }
             };
             saveNotionSettingsBtn.addEventListener('click', saveUserNotionSettings);
@@ -372,7 +374,6 @@
                 }
                 showModal(`<div class="p-6 text-center"><p class="text-lg">Saving to Notion...</p></div>`);
                 try {
-                    // This is your DEPLOYED serverless function URL
                     const proxyUrl = `/.netlify/functions/saveToNotion`;
                     const response = await fetch(proxyUrl, {
                         method: 'POST',
@@ -385,12 +386,21 @@
                     });
 
                     if (!response.ok) {
-                        const errorData = await response.json();
-                        throw new Error(errorData.error || 'Network response was not ok.');
+                        let errorMsg = `Server responded with status: ${response.status}`;
+                        try {
+                            const errorData = await response.json();
+                            errorMsg = errorData.error || JSON.stringify(errorData);
+                        } catch (jsonError) {
+                            console.error("Could not parse error response as JSON.", jsonError);
+                            errorMsg = `Function not found (404) or another server error occurred. Please check your Netlify deploy logs.`;
+                        }
+                        throw new Error(errorMsg);
                     }
+                    
+                    await response.json();
                     showAlert('Successfully saved to Notion!', 'success');
                 } catch (error) {
-                    console.error('Error saving note to Notion:', error);
+                    console.error('Error during saveNoteToNotion:', error);
                     showAlert(`Failed to save to Notion: ${error.message}`, 'error');
                 }
             };
@@ -435,3 +445,4 @@
     </script>
 </body>
 </html>
+
