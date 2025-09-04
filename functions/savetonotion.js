@@ -1,90 +1,51 @@
-const fetch = global.fetch || require('node-fetch');
+const { Client } = require('@notionhq/client');
 
-exports.handler = async function(event, context) {
-    // Only allow POST requests
-    if (event.httpMethod !== 'POST') {
-        return {
-            statusCode: 405, 
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ error: 'Method Not Allowed' })
-        };
+const notion = new Client({ auth: "YOUR_NOTION_INTEGRATION_TOKEN" }); // သင့် token ဖြည့်ပါ
+const databaseId = 'YOUR_DATABASE_ID'; // သင့် database ID ဖြည့်ပါ
+
+async function saveToNotion(payload) {
+  try {
+    const response = await notion.pages.create({
+      parent: { database_id: databaseId },
+      properties: payload
+    });
+
+    // response content-type check
+    if (
+      response &&
+      response.constructor === Object &&
+      response.object !== "error"
+    ) {
+      console.log("Saved successfully:", response);
+      return response;
+    } else {
+      throw new Error("Server returned a non-JSON error page");
     }
-
-    const headers = {
-        'Access-Control-Allow-Origin': '*', // Change to specific domain in production!
-        'Access-Control-Allow-Headers': 'Content-Type',
-        'Access-Control-Allow-Methods': 'POST, OPTIONS',
-        'Content-Type': 'application/json'
-    };
-
-    // Handle preflight CORS request
-    if (event.httpMethod === 'OPTIONS') {
-        return { statusCode: 200, headers, body: 'Preflight CORS OK' };
+  } catch (error) {
+    // fallback for non-JSON errors
+    if (error.name === "SyntaxError" || error.message.includes("non-JSON")) {
+      console.error("Notion server response is not JSON:", error);
+      // handle/display user-friendly error
+      return { error: "Server returned a non-JSON error page." };
     }
+    // handle all other errors
+    console.error("Error saving to Notion:", error);
+    return { error: error.message };
+  }
+}
 
-    try {
-        const { noteContent, notionApiKey, notionDbId } = JSON.parse(event.body || '{}');
-
-        if (!noteContent || !notionApiKey || !notionDbId) {
-            return {
-                statusCode: 400,
-                headers,
-                body: JSON.stringify({ error: 'Missing required fields: noteContent, notionApiKey, notionDbId' })
-            };
+// Example usage:
+const properties = {
+  // Notion database structure နှင့် ကိုက်ညီအောင်ယ်ရေးပါ
+  "Title": {
+    title: [
+      {
+        text: {
+          content: "Test Entry"
         }
-
-        const title = noteContent.substring(0, 100);
-        const contentBlocks = noteContent.split('\n')
-            .filter(p => p.trim() !== '')
-            .map(p => ({
-                object: 'block',
-                type: 'paragraph',
-                paragraph: { rich_text: [{ type: 'text', text: { content: p } }] }
-            }));
-
-        // Notion API call
-        const notionResponse = await fetch('https://api.notion.com/v1/pages', {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${notionApiKey}`,
-                'Content-Type': 'application/json',
-                'Notion-Version': '2022-06-28'
-            },
-            body: JSON.stringify({
-                parent: { database_id: notionDbId },
-                properties: {
-                    // Adjust property name to match Notion DB title property
-                    Name: {
-                        title: [{ text: { content: title } }]
-                    }
-                },
-                children: contentBlocks
-            })
-        });
-
-        const data = await notionResponse.json();
-        if (!notionResponse.ok) {
-            // Notion API error message fallback
-            const errorMsg = data.message || data.error || 'Unknown error';
-            return {
-                statusCode: notionResponse.status,
-                headers,
-                body: JSON.stringify({ error: `Notion API Error: ${errorMsg}` })
-            };
-        }
-
-        return {
-            statusCode: 200,
-            headers,
-            body: JSON.stringify({ message: 'Successfully saved to Notion!', data })
-        };
-
-    } catch (error) {
-        console.error('Server error:', error);
-        return {
-            statusCode: 500,
-            headers,
-            body: JSON.stringify({ error: 'Failed to process request.' })
-        };
-    }
+      }
+    ]
+  }
 };
+
+saveToNotion(properties);
