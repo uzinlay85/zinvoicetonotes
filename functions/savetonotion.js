@@ -1,38 +1,31 @@
-// Notion API client library (optional but recommended for bigger projects)
-// For this simple case, we use fetch.
-const NOTION_API_KEY = process.env.NOTION_API_KEY;
-const NOTION_DATABASE_ID = process.env.NOTION_DATABASE_ID;
-
 exports.handler = async function(event, context) {
     // Only allow POST requests
     if (event.httpMethod !== 'POST') {
         return { statusCode: 405, body: 'Method Not Allowed' };
     }
 
-    // CORS headers to allow requests from your website
+    // CORS headers for security
     const headers = {
-        'Access-Control-Allow-Origin': '*', // Or specify your domain for better security
+        'Access-Control-Allow-Origin': '*', // Allows any domain to call this function. For production, you might want to restrict this to your netlify domain.
         'Access-Control-Allow-Headers': 'Content-Type',
         'Access-Control-Allow-Methods': 'POST, OPTIONS'
     };
 
-    // Handle preflight CORS request
+    // Handle preflight CORS request for browsers
     if (event.httpMethod === 'OPTIONS') {
-        return {
-            statusCode: 200,
-            headers,
-            body: 'This was a preflight request'
-        };
+        return { statusCode: 200, headers, body: 'This was a preflight request' };
     }
 
     try {
-        const { noteContent } = JSON.parse(event.body);
+        // Get the user's specific data from the request sent by the browser
+        const { noteContent, notionApiKey, notionDbId } = JSON.parse(event.body);
 
-        if (!noteContent) {
+        // Validate that all required data is present
+        if (!noteContent || !notionApiKey || !notionDbId) {
             return {
                 statusCode: 400,
                 headers,
-                body: JSON.stringify({ error: 'noteContent is required' })
+                body: JSON.stringify({ error: 'Missing required fields: noteContent, notionApiKey, or notionDbId' })
             };
         }
 
@@ -41,42 +34,38 @@ exports.handler = async function(event, context) {
             object: 'block',
             type: 'paragraph',
             paragraph: {
-                rich_text: [{
-                    type: 'text',
-                    text: {
-                        content: p
-                    },
-                }, ],
+                rich_text: [{ type: 'text', text: { content: p } }],
             },
         }));
 
-
+        // Use the USER-PROVIDED keys to call the Notion API
         const response = await fetch('https://api.notion.com/v1/pages', {
             method: 'POST',
             headers: {
-                'Authorization': `Bearer ${NOTION_API_KEY}`,
+                'Authorization': `Bearer ${notionApiKey}`, // Use the key from the request
                 'Content-Type': 'application/json',
                 'Notion-Version': '2022-06-28'
             },
             body: JSON.stringify({
-                parent: { database_id: NOTION_DATABASE_ID },
+                parent: { database_id: notionDbId }, // Use the database ID from the request
                 properties: {
-                    'Name': { // This must match your database's title column name
-                        title: [{
-                            text: {
-                                content: title
-                            }
-                        }]
+                    'Name': {
+                        title: [{ text: { content: title } }]
                     }
                 },
-                children: contentBlocks // The actual content of the note
+                children: contentBlocks
             })
         });
 
         if (!response.ok) {
             const errorData = await response.json();
             console.error('Notion API Error:', errorData);
-            throw new Error(`Notion API returned status ${response.status}`);
+            // Provide a more specific error message back to the user
+            return {
+                statusCode: response.status,
+                headers,
+                body: JSON.stringify({ error: `Notion API Error: ${errorData.message}` })
+            };
         }
 
         const data = await response.json();
@@ -88,11 +77,11 @@ exports.handler = async function(event, context) {
         };
 
     } catch (error) {
-        console.error('Error saving to Notion:', error);
+        console.error('Server error:', error);
         return {
             statusCode: 500,
             headers,
-            body: JSON.stringify({ error: 'Failed to save note to Notion.' })
+            body: JSON.stringify({ error: 'Failed to process request.' })
         };
     }
 };
