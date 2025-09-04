@@ -37,10 +37,10 @@ exports.handler = async (event, context) => {
     // 2. Initialize the Notion client with the user's API key
     const notion = new Client({ auth: notionApiKey });
 
-    // 3. Prepare the data structure for the Notion database
-    //    IMPORTANT: The keys "Name" and "မှတ်စု" MUST exactly match your Notion database column names.
+    // 3. Prepare the data structure to match your new Notion database columns
+    //    The keys "Name", "Note", "Tag", and "Date" MUST exactly match your Notion column names.
     const properties = {
-      // For the "Name" (Title) column, use a short summary of the note
+      // For the "Name" (Title) column
       "Name": {
         "title": [
           {
@@ -50,9 +50,8 @@ exports.handler = async (event, context) => {
           },
         ],
       },
-      // For the "မှတ်စု" (Rich Text) column, use the full content of the note
-      // If your column name is different, change "မှတ်စု" to your column's name.
-      "မှတ်စု": {
+      // For the "Note" (Rich Text) column
+      "Note": {
         "rich_text": [
           {
             "text": {
@@ -61,6 +60,18 @@ exports.handler = async (event, context) => {
           },
         ],
       },
+      // For the "Tag" (Multi-select) column, we'll add a default tag
+      "Tag": {
+        "multi_select": [
+            { "name": "ZinNotes" }
+        ]
+      },
+      // For the "Date" column, we'll add the current date
+      "Date": {
+        "date": {
+            "start": new Date().toISOString()
+        }
+      }
     };
 
     // 4. Create a new page in the Notion database
