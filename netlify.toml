@@ -1,5 +1,2 @@
-# This is a simplified and direct configuration for your site.
 [build]
-
-# This tells Netlify that your functions are in a folder named "functions".
-functions = "functions"
+  functions = "functions"
