@@ -1,8 +1,16 @@
 const { Client } = require('@notionhq/client');
 
+// NEW HELPER FUNCTION: To split long text into chunks of 2000 characters
+const splitTextIntoChunks = (text, chunkSize = 2000) => {
+  const chunks = [];
+  for (let i = 0; i < text.length; i += chunkSize) {
+    chunks.push(text.substring(i, i + chunkSize));
+  }
+  return chunks;
+};
+
 // Netlify Serverless Function structure
 exports.handler = async (event, context) => {
-  // Handle pre-flight CORS request for browsers
   if (event.httpMethod === 'OPTIONS') {
     return {
       statusCode: 200,
@@ -14,7 +22,6 @@ exports.handler = async (event, context) => {
     };
   }
 
-  // Ensure the request is a POST request
   if (event.httpMethod !== 'POST') {
     return {
       statusCode: 405,
@@ -23,10 +30,8 @@ exports.handler = async (event, context) => {
   }
 
   try {
-    // 1. Parse data from the frontend request
     const { noteContent, notionApiKey, notionDbId } = JSON.parse(event.body);
 
-    // Check if all required data is present
     if (!noteContent || !notionApiKey || !notionDbId) {
       return {
         statusCode: 400,
@@ -34,13 +39,13 @@ exports.handler = async (event, context) => {
       };
     }
 
-    // 2. Initialize the Notion client with the user's API key
     const notion = new Client({ auth: notionApiKey });
 
-    // 3. Prepare the data structure to match your new Notion database columns
-    //    The keys "Name", "Note", "Tag", and "Date" MUST exactly match your Notion column names.
+    // MODIFIED: Split the long noteContent into smaller chunks
+    const noteChunks = splitTextIntoChunks(noteContent);
+
+    // Prepare the data structure for the Notion database
     const properties = {
-      // For the "Name" (Title) column
       "Name": {
         "title": [
           {
@@ -50,23 +55,20 @@ exports.handler = async (event, context) => {
           },
         ],
       },
-      // For the "Note" (Rich Text) column
+      // MODIFIED: Map over the chunks to create multiple text blocks
       "Note": {
-        "rich_text": [
-          {
-            "text": {
-              "content": noteContent,
-            },
+        "rich_text": noteChunks.map(chunk => ({
+          "type": "text",
+          "text": {
+            "content": chunk,
           },
-        ],
+        })),
       },
-      // For the "Tag" (Multi-select) column, we'll add a default tag
       "Tag": {
         "multi_select": [
             { "name": "ZinNotes" }
         ]
       },
-      // For the "Date" column, we'll add the current date
       "Date": {
         "date": {
             "start": new Date().toISOString()
@@ -74,13 +76,11 @@ exports.handler = async (event, context) => {
       }
     };
 
-    // 4. Create a new page in the Notion database
     const response = await notion.pages.create({
       parent: { database_id: notionDbId },
       properties: properties,
     });
 
-    // 5. Send a success response back to the frontend
     return {
       statusCode: 200,
       headers: { 'Access-Control-Allow-Origin': '*' },
@@ -88,7 +88,6 @@ exports.handler = async (event, context) => {
     };
 
   } catch (error) {
-    // Handle any errors that occur during the process
     console.error('Error saving to Notion:', error);
     return {
       statusCode: 500,
