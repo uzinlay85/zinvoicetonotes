@@ -1,2 +1,9 @@
+# This tells Netlify where to find the functions to build
 [build]
   functions = "functions"
+
+# This is the new, explicit rule to connect the /api/ path to your functions
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
