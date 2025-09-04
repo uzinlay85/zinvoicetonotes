@@ -63,14 +63,7 @@
                         <button id="save-key-btn" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">Save</button>
                     </div>
                 </div>
-                <div class="mt-6">
-                    <label for="model-select" class="block text-sm font-medium text-gray-700">AI မော်ဒယ်ရွေးချယ်ပါ:</label>
-                    <select id="model-select" class="mt-1 w-full p-2 border border-gray-300 rounded-md shadow-sm bg-white">
-                        <option value="gemini-1.5-flash">Gemini 1.5 Flash (အကြံပြုထား)</option>
-                        <option value="gemini-pro">Gemini Pro</option>
-                    </select>
                 </div>
-            </div>
 
             <div class="bg-white p-5 rounded-lg shadow-md mb-6">
                 <h3 class="text-lg font-semibold border-b pb-2 mb-4">Notion Integration</h3>
@@ -143,7 +136,6 @@
     </div>
 
     <script type="module">
-        // CORRECTED: Import GoogleGenerativeAI using the ES Module method.
         import { GoogleGenerativeAI } from "https://cdn.jsdelivr.net/npm/@google/generative-ai/+esm";
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -151,7 +143,6 @@
             const NOTES_KEY = 'zinnotes_notes';
             const HISTORY_KEY = 'zinnotes_history';
             const API_KEY = 'gemini_api_key';
-            const MODEL_KEY = 'zinnotes_selected_model';
             const USER_NOTION_SETTINGS_KEY = 'zinnotes_user_notion_settings';
             let isRecording = false;
             let mediaRecorder;
@@ -172,7 +163,6 @@
             const importFileInput = document.getElementById('import-file');
             const modalContainer = document.getElementById('modal-container');
             const modalContent = document.getElementById('modal-content');
-            const modelSelect = document.getElementById('model-select');
             const timerDisplay = document.getElementById('timer-display');
             const notionKeyInput = document.getElementById('notion-key-input');
             const notionDbIdInput = document.getElementById('notion-db-id-input');
@@ -256,9 +246,6 @@
                     showAlert('Please enter a valid API Key.', 'error');
                 }
             };
-            const saveModelSelection = () => {
-                localStorage.setItem(MODEL_KEY, modelSelect.value);
-            };
             const saveUserNotionSettings = () => {
                 const notionApiKey = notionKeyInput.value.trim();
                 const notionDbId = notionDbIdInput.value.trim();
@@ -271,14 +258,12 @@
             };
             const loadSettings = () => {
                 apiKeyInput.value = getApiKey() || '';
-                modelSelect.value = localStorage.getItem(MODEL_KEY) || 'gemini-1.5-flash';
                 const userNotionSettings = getFromStorage(USER_NOTION_SETTINGS_KEY, true);
                 notionKeyInput.value = userNotionSettings.notionApiKey || '';
                 notionDbIdInput.value = userNotionSettings.notionDbId || '';
             };
 
             saveKeyBtn.addEventListener('click', saveApiKey);
-            modelSelect.addEventListener('change', saveModelSelection);
             saveUserNotionSettingsBtn.addEventListener('click', saveUserNotionSettings);
 
             // TRANSCRIPTION LOGIC
@@ -290,14 +275,14 @@
                 }
                 liveTranscriptionDiv.textContent = 'Transcribing with Gemini...';
                 try {
-                    // CORRECTED: Call the constructor directly as it is now imported.
                     const genAI = new GoogleGenerativeAI(apiKey);
-                    const model = genAI.getGenerativeModel({ model: modelSelect.value });
+                    // MODIFIED: Model is now hardcoded to the best general-purpose choice
+                    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
                     
                     const reader = new FileReader();
                     reader.readAsDataURL(audioBlob);
                     await new Promise(resolve => reader.onload = resolve);
-                    const base64Audio = reader.result.split(',')[1]; // Get only the base64 part
+                    const base64Audio = reader.result.split(',')[1];
                     
                     const audioPart = {
                         inlineData: {
