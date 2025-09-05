@@ -272,21 +272,20 @@
         // Make sure to add your website's URL to the "Authorized JavaScript origins"
         // and "Authorized redirect URIs" in your OAuth 2.0 Client ID settings.
         const GOOGLE_CLIENT_ID = "435849312063-815sr50dkvidusrbltfmb57isc0ff148.apps.googleusercontent.com"; // Replace with your actual Client ID
-        const GOOGLE_API_KEY = "AIzaSyA3n25zgMMgg7tqaGpSn2hXU8bOQHnv2ho"; // Replace with your actual API Key
+        const GOOGLE_API_KEY = "YOUR_GOOGLE_API_KEY_HERE"; // Replace with your actual API Key
 
         const DRIVE_DISCOVERY_DOC = 'https://www.googleapis.com/discovery/v1/apis/drive/v3/rest';
         const DRIVE_SCOPES = 'https://www.googleapis.com/auth/drive.file';
         const BACKUP_FILE_NAME = 'zinnotes_backup.json';
         
         // --- Google API Initialization ---
-        window.gapiLoaded = () => {
+        const handleGapiLoad = () => {
             gapi = window.gapi;
             gapi.load('client', initializeGapiClient);
         };
 
         async function initializeGapiClient() {
             try {
-                // FIXED: Added the API Key for proper client initialization.
                 await gapi.client.init({
                     apiKey: GOOGLE_API_KEY,
                     discoveryDocs: [DRIVE_DISCOVERY_DOC]
@@ -299,10 +298,7 @@
             }
         }
 
-        window.gisLoaded = () => {
-            // FIXED: The conditional logic here was incorrect.
-            // It was preventing initialization if the correct client ID was provided.
-            // This now correctly checks if a non-placeholder ID is present.
+        const handleGisLoad = () => {
             if (GOOGLE_CLIENT_ID && GOOGLE_CLIENT_ID !== "YOUR_GOOGLE_CLIENT_ID_HERE") {
                 try {
                     tokenClient = google.accounts.oauth2.initTokenClient({
@@ -318,7 +314,6 @@
                             }
                         },
                     });
-                    // Enable the button and change text once the client is ready
                     gdriveAuthBtn.disabled = false;
                     gdriveAuthBtn.innerHTML = `
                         <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M21.12,10.2h-9.3c-0.44,0-0.8,0.36-0.8,0.8s0.36,0.8,0.8,0.8h8.48c-0.53,4.32-4.13,7.59-8.48,7.59c-4.73,0-8.59-3.86-8.59-8.59 s3.86-8.59,8.59-8.59c2.25,0,4.29,0.88,5.81,2.3l1.13-1.13C17.3,3.31,14.8,2,11.82,2C6.4,2,2,6.4,2,11.82s4.4,9.82,9.82,9.82 c5.21,0,9.47-4.09,9.8-9.32C21.68,11.19,21.46,10.2,21.12,10.2z"></path></svg>
@@ -779,7 +774,12 @@
         modalContainer.addEventListener('click', (e) => { if (e.target === modalContainer) hideModal(); });
         
         // --- Loader for Google API Scripts ---
-        function loadGoogleApiScripts() {
+        function setupAndLoadGoogleApis() {
+            // Assign the module's functions to be the global callbacks
+            window.gapiLoaded = handleGapiLoad;
+            window.gisLoaded = handleGisLoad;
+            
+            // Now that the callbacks are globally available, load the scripts
             const gapiScript = document.createElement('script');
             gapiScript.src = 'https://apis.google.com/js/api.js?onload=gapiLoaded';
             gapiScript.async = true;
@@ -795,7 +795,7 @@
 
         // --- Initial Load ---
         loadSettings();
-        loadGoogleApiScripts();
+        setupAndLoadGoogleApis();
         showPage('home-page');
         const savedTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
         applyTheme(savedTheme);
