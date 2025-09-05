@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ZinNotes - AI Voice Notes</title>
     
-    <!-- NEW: Favicon for the browser tab -->
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath fill='%234f46e5' d='M50 62.5c6.9 0 12.5-5.6 12.5-12.5V25c0-6.9-5.6-12.5-12.5-12.5S37.5 18.1 37.5 25v25c0 6.9 5.6 12.5 12.5 12.5z'/%3E%3Cpath fill='%234f46e5' d='M68.75 50c0 10.35-8.4 18.75-18.75 18.75S31.25 60.35 31.25 50h-6.25c0 13.8 11.2 25.2 25 25.8V87.5h-12.5v6.25h31.25V87.5H50v-11.7c13.8-.6 25-12 25-25.8z'/%3E%3C/svg%3E">
 
     <!-- Tailwind CSS CDN -->
@@ -15,54 +14,35 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Padauk:wght@400;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
-    <!-- Custom Styles for the new UI -->
+    <!-- Custom Styles -->
     <style>
         body { 
             font-family: 'Inter', 'Padauk', sans-serif; 
-            background-color: #f8fafc; /* Tailwind's slate-50 */
+            background-color: #f8fafc;
             transition: background-color 0.3s ease, color 0.3s ease;
         }
         .dark body {
-            background-color: #0f172a; /* Tailwind's slate-900 */
+            background-color: #0f172a;
         }
-        /* Custom pulse animation for recording */
-        .pulse-red { 
-            animation: pulse-red 1.5s infinite; 
-        }
+        .pulse-red { animation: pulse-red 1.5s infinite; }
         @keyframes pulse-red {
             0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.6); }
             70% { box-shadow: 0 0 0 25px rgba(239, 68, 68, 0); }
             100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
         }
-        /* Custom glowing effect for the mic button */
-        .glow-blue {
-            box-shadow: 0 0 15px 5px rgba(99, 102, 241, 0.4);
-        }
-        /* Custom scrollbar for a cleaner look */
+        .glow-blue { box-shadow: 0 0 15px 5px rgba(99, 102, 241, 0.4); }
         .custom-scrollbar::-webkit-scrollbar { width: 6px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: #e2e8f0; } /* slate-200 */
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 3px; } /* slate-400 */
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #64748b; } /* slate-500 */
-        .dark .custom-scrollbar::-webkit-scrollbar-track { background: #1e293b; } /* slate-800 */
-        .dark .custom-scrollbar::-webkit-scrollbar-thumb { background: #475569; } /* slate-600 */
-        .dark .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #64748b; } /* slate-500 */
-        
-        /* Remove default marker from details/summary */
+        .custom-scrollbar::-webkit-scrollbar-track { background: #e2e8f0; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 3px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #64748b; }
+        .dark .custom-scrollbar::-webkit-scrollbar-track { background: #1e293b; }
+        .dark .custom-scrollbar::-webkit-scrollbar-thumb { background: #475569; }
+        .dark .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #64748b; }
         details > summary { list-style: none; }
         details > summary::-webkit-details-marker { display: none; }
-
-        /* Smooth transition for accordion icon */
-        details summary .chevron {
-            transition: transform 0.2s ease-in-out;
-        }
-        details[open] summary .chevron {
-            transform: rotate(180deg);
-        }
-
-        /* Toast Notification Styles */
-        .toast {
-            animation: toast-in 0.5s, toast-out 0.5s 2.5s;
-        }
+        details summary .chevron { transition: transform 0.2s ease-in-out; }
+        details[open] summary .chevron { transform: rotate(180deg); }
+        .toast { animation: toast-in 0.5s, toast-out 0.5s 2.5s; }
         @keyframes toast-in {
             from { transform: translateY(100%); opacity: 0; }
             to { transform: translateY(0); opacity: 1; }
@@ -75,14 +55,14 @@
 </head>
 <body class="text-slate-800 dark:text-slate-200 flex flex-col h-screen overflow-hidden">
 
-    <!-- Header with Glassmorphism Effect -->
+    <!-- Header -->
     <header class="bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm sticky top-0 z-40 border-b border-slate-200 dark:border-slate-700">
         <div class="max-w-3xl mx-auto py-4 px-4 sm:px-6">
             <h1 class="text-2xl font-bold text-indigo-600 dark:text-indigo-400">ZinNotes</h1>
         </div>
     </header>
 
-    <!-- Main Content Area -->
+    <!-- Main Content -->
     <main class="flex-grow overflow-y-auto custom-scrollbar p-4 sm:p-6 pb-24">
         <div class="max-w-3xl mx-auto w-full">
             <!-- Home Page -->
@@ -117,18 +97,12 @@
                 <div id="notes-list" class="space-y-3"></div>
             </div>
 
-            <!-- History Page -->
-            <div id="history-page" class="page hidden">
-                <h2 class="text-3xl font-extrabold mb-2 text-slate-900 dark:text-white">မှတ်တမ်းများ</h2>
-                <p class="text-sm text-slate-500 dark:text-slate-400 mb-6">မသိမ်းဆည်းရသေးသော မှတ်တမ်းများကို ၂၄ နာရီအထိ ထားရှိပါမည်။</p>
-                <div id="history-list" class="space-y-3"></div>
-            </div>
+            <!-- History Page REMOVED -->
 
             <!-- Settings Page -->
             <div id="settings-page" class="page hidden">
                 <h2 class="text-3xl font-extrabold mb-6 text-slate-900 dark:text-white">Settings</h2>
                 <div class="space-y-6">
-                    <!-- Card 0: Theme Toggle -->
                     <div class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-md border border-slate-200 dark:border-slate-700">
                         <div class="flex justify-between items-center">
                             <h3 class="text-lg font-semibold">Dark Mode</h3>
@@ -139,7 +113,6 @@
                         </div>
                     </div>
                     
-                    <!-- Card 1: API Config -->
                     <div class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-md border border-slate-200 dark:border-slate-700">
                         <h3 class="text-lg font-semibold border-b border-slate-200 dark:border-slate-700 pb-3 mb-4">Gemini API Configuration</h3>
                         <div>
@@ -152,7 +125,6 @@
                         </div>
                     </div>
 
-                    <!-- Card 2: Notion Integration -->
                     <div class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-md border border-slate-200 dark:border-slate-700">
                         <h3 class="text-lg font-semibold border-b border-slate-200 dark:border-slate-700 pb-3 mb-4">Notion Integration</h3>
                         <div class="space-y-4">
@@ -206,7 +178,7 @@
         </div>
     </main>
 
-    <!-- Bottom Navigation Bar -->
+    <!-- Bottom Navigation Bar MODIFIED -->
     <nav class="fixed bottom-0 left-0 right-0 bg-white/70 dark:bg-slate-900/70 backdrop-blur-sm border-t border-slate-200 dark:border-slate-700 shadow-t-lg">
         <div class="flex justify-around max-w-3xl mx-auto">
             <button data-page="home-page" class="nav-item flex-1 py-2 px-1 text-indigo-600 flex flex-col items-center space-y-1 transition-colors duration-200">
@@ -217,10 +189,7 @@
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
                 <span class="text-xs font-medium">Notes</span>
             </button>
-            <button data-page="history-page" class="nav-item flex-1 py-2 px-1 text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 flex flex-col items-center space-y-1 transition-colors duration-200">
-                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                <span class="text-xs font-medium">History</span>
-            </button>
+            <!-- History Button REMOVED -->
             <button data-page="settings-page" class="nav-item flex-1 py-2 px-1 text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 flex flex-col items-center space-y-1 transition-colors duration-200">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                 <span class="text-xs font-medium">Settings</span>
@@ -248,7 +217,6 @@
             const searchInput = document.getElementById('search-notes');
             
             const NOTES_KEY = 'zinnotes_notes';
-            const HISTORY_KEY = 'zinnotes_history';
             const API_KEY = 'gemini_api_key';
             const USER_NOTION_SETTINGS_KEY = 'zinnotes_user_notion_settings';
             let isRecording = false;
@@ -261,7 +229,6 @@
             const micButton = document.getElementById('mic-btn');
             const liveTranscriptionDiv = document.getElementById('live-transcription');
             const notesList = document.getElementById('notes-list');
-            const historyList = document.getElementById('history-list');
             const apiKeyInput = document.getElementById('api-key-input');
             const saveKeyBtn = document.getElementById('save-key-btn');
             const exportBtn = document.getElementById('export-btn');
@@ -275,6 +242,8 @@
             const saveUserNotionSettingsBtn = document.getElementById('save-user-notion-settings-btn');
             const audioUploadBtn = document.getElementById('audio-upload-btn');
             const audioUploadInput = document.getElementById('audio-upload-input');
+
+            // --- All functions remain below ---
 
             const showToast = (message, type = 'success') => {
                 const colors = { success: 'bg-green-500', error: 'bg-red-500', info: 'bg-blue-500' };
@@ -335,7 +304,6 @@
                     item.classList.toggle('dark:text-slate-400', !isActive);
                 });
                 if (pageId === 'notes-page') renderNotes();
-                if (pageId === 'history-page') renderHistory();
             };
             navItems.forEach(item => item.addEventListener('click', (e) => showPage(e.currentTarget.dataset.page)));
 
@@ -387,8 +355,20 @@
                 }
             };
             
+            // MODIFIED: This function now redirects to the notes page
+            const handleTranscriptionSuccess = (text) => {
+                 if (text) {
+                    liveTranscriptionDiv.innerHTML = '';
+                    saveNote(text);
+                    showToast("Transcription saved!");
+                    showPage('notes-page');
+                } else {
+                    liveTranscriptionDiv.textContent = 'Could not transcribe. Please try again.';
+                }
+            };
+
             const startRecording = async () => {
-                if (!getApiKey()) { showAlert("API Key မထည့်သွင်းရသေးပါ။ Settings သို့သွား၍ API Key ထည့်သွင်းပေးပါ။", 'error'); return; }
+                if (!getApiKey()) { showAlert("API Key မထည့်သွင်းရသေးပါ။", 'error'); return; }
                 try {
                     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
                     isRecording = true;
@@ -404,14 +384,7 @@
                         if(audioChunks.length === 0) return;
                         const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
                         const text = await transcribeAudioWithGemini(audioBlob);
-                        if (text) {
-                            liveTranscriptionDiv.textContent = text;
-                            saveNote(text);
-                            saveHistory(text);
-                            showToast("Transcription saved!");
-                        } else {
-                            liveTranscriptionDiv.textContent = 'Could not transcribe. Please try again.';
-                        }
+                        handleTranscriptionSuccess(text);
                     };
                 } catch (err) {
                     console.error("Microphone error:", err);
@@ -436,14 +409,7 @@
                 liveTranscriptionDiv.innerHTML = `<div class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400"><svg class="w-8 h-8 mb-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg><p class="font-semibold break-all">ဖိုင်: <span class="font-normal">${file.name}</span></p><p class="text-sm">ဖိုင်တင်ပြီးပါပြီ။ ခေတ္တစောင့်ဆိုင်းပေးပါ...</p></div>`;
                 setTimeout(async () => {
                     const text = await transcribeAudioWithGemini(file);
-                    if (text) {
-                        liveTranscriptionDiv.textContent = text;
-                        saveNote(text);
-                        saveHistory(text);
-                        showToast("File transcribed and saved!");
-                    } else {
-                        liveTranscriptionDiv.textContent = 'Could not transcribe file. Please try again.';
-                    }
+                    handleTranscriptionSuccess(text);
                 }, 1000);
                 event.target.value = '';
             });
@@ -462,11 +428,9 @@
                 }
                 saveToStorage(NOTES_KEY, notes);
             };
-            const saveHistory = (content) => {
-                let history = getFromStorage(HISTORY_KEY);
-                history.unshift({ id: Date.now(), content: content, createdAt: new Date().toISOString() });
-                saveToStorage(HISTORY_KEY, history.slice(0, 50));
-            };
+
+            // History logic is now fully removed
+            
             const deleteNote = (id) => {
                 showConfirm("Are you sure you want to delete this note?", () => {
                     let notes = getFromStorage(NOTES_KEY);
@@ -539,24 +503,6 @@
                     notesList.appendChild(card);
                 });
             };
-            const renderHistory = () => {
-                historyList.innerHTML = '';
-                const history = getFromStorage(HISTORY_KEY);
-                if (history.length === 0) { historyList.innerHTML = '<div class="text-center text-slate-500 dark:text-slate-400 py-10"><p>No recent transcription history.</p></div>'; return; }
-                 history.forEach(item => {
-                    const el = document.createElement('div');
-                    el.className = 'bg-white dark:bg-slate-800 p-4 rounded-xl shadow-md border border-slate-200 dark:border-slate-700 flex justify-between items-center';
-                    el.innerHTML = `<div class="flex-1 min-w-0 mr-4"><p class="text-sm text-slate-700 dark:text-slate-300 truncate">${item.content}</p><p class="text-xs text-slate-400 mt-1">${new Date(item.createdAt).toLocaleTimeString()}</p></div><button data-content="${item.content}" class="save-from-history-btn flex-shrink-0 bg-indigo-100 text-indigo-700 text-xs font-semibold px-3 py-1 rounded-full hover:bg-indigo-200">Save to Notes</button>`;
-                    historyList.appendChild(el);
-                });
-            };
-            historyList.addEventListener('click', (e) => {
-                if (e.target.classList.contains('save-from-history-btn')) {
-                    const content = e.target.dataset.content;
-                    saveNote(content);
-                    showToast('Saved to notes!');
-                }
-            });
 
             const exportBtnLogic = () => {
                 const notes = getFromStorage(NOTES_KEY);
