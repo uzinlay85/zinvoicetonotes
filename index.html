@@ -94,10 +94,20 @@
                         <svg class="w-5 h-5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                     </div>
                 </div>
+                
+                <div class="mb-6">
+                    <div class="bg-white dark:bg-slate-800 rounded-xl shadow-md border border-slate-200 dark:border-slate-700 p-4">
+                        <textarea id="new-text-note" class="w-full h-24 p-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-slate-50 dark:bg-slate-700 focus:ring-2 focus:ring-indigo-500 focus:outline-none transition" placeholder="ဒီနေရာမှာ မှတ်စုအသစ် ရေးသား (သို့) paste ချပါ..."></textarea>
+                        <div class="flex justify-end mt-2">
+                            <button id="save-text-note-btn" class="bg-indigo-600 text-white px-5 py-2 rounded-lg hover:bg-indigo-700 font-semibold transition">မှတ်စု သိမ်းမည်</button>
+                        </div>
+                    </div>
+                </div>
+
                 <div id="notes-list" class="space-y-3"></div>
             </div>
 
-            <!-- History Page REMOVED -->
+            <!-- History Page Block Has Been REMOVED -->
 
             <!-- Settings Page -->
             <div id="settings-page" class="page hidden">
@@ -197,24 +207,23 @@
         </div>
     </nav>
 
-    <!-- Modal Structure -->
+    <!-- Modal and Toast Containers -->
     <div id="modal-container" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 hidden z-50" aria-modal="true" role="dialog">
-        <div id="modal-content" class="bg-white dark:bg-slate-800 rounded-xl shadow-xl w-full max-w-md border border-slate-200 dark:border-slate-700">
-            <!-- Modal content will be injected here -->
-        </div>
+        <div id="modal-content" class="bg-white dark:bg-slate-800 rounded-xl shadow-xl w-full max-w-md border border-slate-200 dark:border-slate-700"></div>
     </div>
-    
-    <!-- Toast Notification Container -->
     <div id="toast-container" class="fixed bottom-20 right-4 space-y-2 z-50"></div>
 
     <script type="module">
         import { GoogleGenerativeAI } from "https://cdn.jsdelivr.net/npm/@google/generative-ai/+esm";
 
         document.addEventListener('DOMContentLoaded', () => {
+            // Your provided JS Code with modifications to remove History
             const themeToggle = document.getElementById('theme-toggle');
             const themeToggleIndicator = document.getElementById('theme-toggle-indicator');
             const toastContainer = document.getElementById('toast-container');
             const searchInput = document.getElementById('search-notes');
+            const newTextNoteInput = document.getElementById('new-text-note');
+            const saveTextNoteBtn = document.getElementById('save-text-note-btn');
             
             const NOTES_KEY = 'zinnotes_notes';
             const API_KEY = 'gemini_api_key';
@@ -242,8 +251,8 @@
             const saveUserNotionSettingsBtn = document.getElementById('save-user-notion-settings-btn');
             const audioUploadBtn = document.getElementById('audio-upload-btn');
             const audioUploadInput = document.getElementById('audio-upload-input');
-
-            // --- All functions remain below ---
+            
+            // --- All functions are defined below ---
 
             const showToast = (message, type = 'success') => {
                 const colors = { success: 'bg-green-500', error: 'bg-red-500', info: 'bg-blue-500' };
@@ -256,9 +265,7 @@
                 toast.className = `toast flex items-center space-x-3 text-white font-semibold py-2 px-4 rounded-full shadow-lg ${colors[type]}`;
                 toast.innerHTML = `${icon[type]}<span>${message}</span>`;
                 toastContainer.appendChild(toast);
-                setTimeout(() => {
-                    toast.remove();
-                }, 3000);
+                setTimeout(() => { toast.remove(); }, 3000);
             };
             
             const getFromStorage = (key, isObject = false) => {
@@ -304,6 +311,7 @@
                     item.classList.toggle('dark:text-slate-400', !isActive);
                 });
                 if (pageId === 'notes-page') renderNotes();
+                // History call removed
             };
             navItems.forEach(item => item.addEventListener('click', (e) => showPage(e.currentTarget.dataset.page)));
 
@@ -355,13 +363,13 @@
                 }
             };
             
-            // MODIFIED: This function now redirects to the notes page
+            // NEW: Central function to handle what happens after a successful transcription
             const handleTranscriptionSuccess = (text) => {
                  if (text) {
                     liveTranscriptionDiv.innerHTML = '';
                     saveNote(text);
                     showToast("Transcription saved!");
-                    showPage('notes-page');
+                    showPage('notes-page'); // Directly go to notes page
                 } else {
                     liveTranscriptionDiv.textContent = 'Could not transcribe. Please try again.';
                 }
@@ -429,7 +437,7 @@
                 saveToStorage(NOTES_KEY, notes);
             };
 
-            // History logic is now fully removed
+            // saveHistory function REMOVED
             
             const deleteNote = (id) => {
                 showConfirm("Are you sure you want to delete this note?", () => {
@@ -489,7 +497,7 @@
                 }
 
                 if (notes.length === 0) {
-                    notesList.innerHTML = `<div class="text-center text-slate-500 dark:text-slate-400 py-10"><svg class="mx-auto h-12 w-12 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg><h3 class="mt-2 text-sm font-medium text-slate-900 dark:text-white">${searchTerm ? 'No matching notes' : 'No saved notes yet'}</h3><p class="mt-1 text-sm text-slate-500 dark:text-slate-400">${searchTerm ? 'Try a different search term.' : 'Use the microphone to start.'}</p></div>`;
+                    notesList.innerHTML = `<div class="text-center text-slate-500 dark:text-slate-400 py-10"><svg class="mx-auto h-12 w-12 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg><h3 class="mt-2 text-sm font-medium text-slate-900 dark:text-white">${searchTerm ? 'No matching notes' : 'No saved notes yet'}</h3><p class="mt-1 text-sm text-slate-500 dark:text-slate-400">${searchTerm ? 'Try a different search term.' : 'Use the microphone or type a note above.'}</p></div>`;
                     return;
                 }
                 notes.forEach(note => {
@@ -504,6 +512,8 @@
                 });
             };
 
+            // renderHistory function REMOVED
+            
             const exportBtnLogic = () => {
                 const notes = getFromStorage(NOTES_KEY);
                 if (notes.length === 0) return showAlert("There are no notes to export.", 'info');
@@ -560,6 +570,20 @@
                 renderNotes(e.target.value);
             });
 
+            // NEW: Event listener for the new text note save button
+            saveTextNoteBtn.addEventListener('click', () => {
+                const content = newTextNoteInput.value.trim();
+                if (content) {
+                    saveNote(content);
+                    newTextNoteInput.value = ''; // Clear the textarea
+                    renderNotes(); // Refresh the list
+                    showToast('Note saved successfully!');
+                } else {
+                    showToast('Please write something first.', 'error');
+                }
+            });
+
+            // Initial Load
             loadSettings();
             showPage('home-page');
             const savedTheme = localStorage.getItem('theme') || 'light';
@@ -568,5 +592,4 @@
     </script>
 </body>
 </html>
-
 
