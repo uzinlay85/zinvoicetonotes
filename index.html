@@ -268,9 +268,6 @@
         let tokenClient;
         
         // --- Google Drive Configuration ---
-        // TODO: Get your Client ID and API Key from https://console.cloud.google.com/
-        // Make sure to add your website's URL to the "Authorized JavaScript origins"
-        // and "Authorized redirect URIs" in your OAuth 2.0 Client ID settings.
         const GOOGLE_CLIENT_ID = "435849312063-815sr50dkvidusrbltfmb57isc0ff148.apps.googleusercontent.com"; // Replace with your actual Client ID
         const GOOGLE_API_KEY = "AIzaSyA3n25zgMMgg7tqaGpSn2hXU8bOQHnv2ho"; // Replace with your actual API Key
 
@@ -279,12 +276,14 @@
         const BACKUP_FILE_NAME = 'zinnotes_backup.json';
         
         // --- Google API Initialization ---
-        const handleGapiLoad = () => {
-            gapi = window.gapi;
-            gapi.load('client', initializeGapiClient);
-        };
-
+        
         async function initializeGapiClient() {
+            // New check for placeholder value
+            if (GOOGLE_API_KEY === 'YOUR_GOOGLE_API_KEY_HERE') {
+                gdriveAuthBtn.textContent = 'API Key မသတ်မှတ်ရသေးပါ';
+                showAlert('ကျေးဇူးပြု၍ သင်၏ Google API Key ကို ကုဒ်ထဲတွင် ထည့်သွင်းပါ။', 'error');
+                return;
+            }
             try {
                 await gapi.client.init({
                     apiKey: GOOGLE_API_KEY,
@@ -293,42 +292,41 @@
             } catch (error) {
                 console.error("Error initializing GAPI client:", error);
                 gdriveAuthBtn.textContent = 'API Init Error';
-                gdriveAuthBtn.disabled = true;
-                showAlert('Could not initialize Google API client. Please check your API Key and console for errors.', 'error');
+                showAlert('Google API ကို စတင်ရာတွင် အမှားအယွင်းဖြစ်ပေါ်နေပါသည်။ သင်၏ API Key မှာ Website Restriction (HTTP referrers) ကန့်သတ်ချက်များ မှန်ကန်မှုရှိမရှိ Google Cloud Console တွင် ပြန်လည်စစ်ဆေးပါ။', 'error');
             }
         }
 
-        const handleGisLoad = () => {
-            if (GOOGLE_CLIENT_ID && GOOGLE_CLIENT_ID !== "YOUR_GOOGLE_CLIENT_ID_HERE") {
-                try {
-                    tokenClient = google.accounts.oauth2.initTokenClient({
-                        client_id: GOOGLE_CLIENT_ID,
-                        scope: DRIVE_SCOPES,
-                        callback: (tokenResponse) => {
-                            if (tokenResponse && tokenResponse.access_token) {
-                                gapi.client.setToken(tokenResponse);
-                                updateDriveUi(true);
-                            } else {
-                                console.error("No access token received.");
-                                updateDriveUi(false);
-                            }
-                        },
-                    });
-                    gdriveAuthBtn.disabled = false;
-                    gdriveAuthBtn.innerHTML = `
-                        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M21.12,10.2h-9.3c-0.44,0-0.8,0.36-0.8,0.8s0.36,0.8,0.8,0.8h8.48c-0.53,4.32-4.13,7.59-8.48,7.59c-4.73,0-8.59-3.86-8.59-8.59 s3.86-8.59,8.59-8.59c2.25,0,4.29,0.88,5.81,2.3l1.13-1.13C17.3,3.31,14.8,2,11.82,2C6.4,2,2,6.4,2,11.82s4.4,9.82,9.82,9.82 c5.21,0,9.47-4.09,9.8-9.32C21.68,11.19,21.46,10.2,21.12,10.2z"></path></svg>
-                        <span>Connect to Google Drive</span>`;
-                } catch(error){ 
-                    console.error("Error initializing GIS client:", error);
-                    gdriveAuthBtn.textContent = 'Auth Error';
-                    gdriveAuthBtn.disabled = true;
-                }
-            } else {
-                console.error("Google Client ID is not set. Please set the GOOGLE_CLIENT_ID constant.");
-                gdriveAuthBtn.textContent = 'Client ID not set';
+        function initializeGisClient() {
+            // New check for placeholder value
+            if (GOOGLE_CLIENT_ID === 'YOUR_GOOGLE_CLIENT_ID_HERE') {
+                 gdriveAuthBtn.textContent = 'Client ID မသတ်မှတ်ရသေးပါ';
+                 showAlert('ကျေးဇူးပြု၍ သင်၏ Google Client ID ကို ကုဒ်ထဲတွင် ထည့်သွင်းပါ။', 'error');
+                 return;
+            }
+            try {
+                tokenClient = google.accounts.oauth2.initTokenClient({
+                    client_id: GOOGLE_CLIENT_ID,
+                    scope: DRIVE_SCOPES,
+                    callback: (tokenResponse) => {
+                        if (tokenResponse && tokenResponse.access_token) {
+                            gapi.client.setToken(tokenResponse);
+                            updateDriveUi(true);
+                        } else {
+                            console.error("No access token received from GIS callback.");
+                            updateDriveUi(false);
+                        }
+                    },
+                });
+                gdriveAuthBtn.disabled = false;
+                gdriveAuthBtn.innerHTML = `
+                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M21.12,10.2h-9.3c-0.44,0-0.8,0.36-0.8,0.8s0.36,0.8,0.8,0.8h8.48c-0.53,4.32-4.13,7.59-8.48,7.59c-4.73,0-8.59-3.86-8.59-8.59 s3.86-8.59,8.59-8.59c2.25,0,4.29,0.88,5.81,2.3l1.13-1.13C17.3,3.31,14.8,2,11.82,2C6.4,2,2,6.4,2,11.82s4.4,9.82,9.82,9.82 c5.21,0,9.47-4.09,9.8-9.32C21.68,11.19,21.46,10.2,21.12,10.2z"></path></svg>
+                    <span>Connect to Google Drive</span>`;
+            } catch(error){ 
+                console.error("Error initializing GIS client:", error);
+                gdriveAuthBtn.textContent = 'Auth Error';
                 gdriveAuthBtn.disabled = true;
             }
-        };
+        }
         
         const showToast = (message, type = 'success') => {
             const colors = { success: 'bg-green-500', error: 'bg-red-500', info: 'bg-blue-500' };
@@ -355,7 +353,6 @@
         const showModal = (htmlContent) => {
             modalContent.innerHTML = htmlContent;
             modalContainer.classList.remove('hidden');
-            // Use a short timeout to ensure elements are in the DOM before attaching listeners
             setTimeout(() => {
                 modalContent.querySelectorAll('.modal-close, .modal-cancel').forEach(btn => btn.onclick = hideModal);
             }, 30);
@@ -513,8 +510,6 @@
             if (!notionApiKey || !notionDbId) { showAlert('Please set your Notion settings first.', 'error'); return; }
             showModal(`<div class="p-6 text-center"><p class="text-lg">Saving to Notion...</p></div>`);
             try {
-                // This requires a server-side proxy to work due to CORS.
-                // For this example, we assume one exists at '/api/saveToNotion'
                 const response = await fetch('/api/saveToNotion', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -607,7 +602,6 @@
                 themeToggleIndicator.classList.add('translate-x-5');
             } else {
                 document.documentElement.classList.remove('dark');
-                document.documentElement.classList.remove('dark'); // Double check removal
                 themeToggleIndicator.classList.remove('translate-x-5');
             }
         };
@@ -618,10 +612,8 @@
                 return;
             }
             if (gapi.client.getToken() === null) {
-                // Prompt the user to select an account and grant access on first sign-in.
                 tokenClient.requestAccessToken({ prompt: 'consent' });
             } else {
-                // Skip the account selection prompt on subsequent calls.
                 tokenClient.requestAccessToken({ prompt: '' });
             }
         }
@@ -669,7 +661,6 @@
             const blob = new Blob([content], { type: 'application/json' });
             const fileId = await searchForBackupFile();
             
-            // Using gapi.client.request for multipart upload
             const boundary = '-------314159265358979323846';
             const delimiter = "\r\n--" + boundary + "\r\n";
             const close_delim = "\r\n--" + boundary + "--";
@@ -774,28 +765,39 @@
         modalContainer.addEventListener('click', (e) => { if (e.target === modalContainer) hideModal(); });
         
         // --- Loader for Google API Scripts ---
-        function setupAndLoadGoogleApis() {
-            // Assign the module's functions to be the global callbacks
-            window.gapiLoaded = handleGapiLoad;
-            window.gisLoaded = handleGisLoad;
-            
-            // Now that the callbacks are globally available, load the scripts
-            const gapiScript = document.createElement('script');
-            gapiScript.src = 'https://apis.google.com/js/api.js?onload=gapiLoaded';
-            gapiScript.async = true;
-            gapiScript.defer = true;
-            document.head.appendChild(gapiScript);
+        function loadScript(src) {
+            return new Promise((resolve, reject) => {
+                const script = document.createElement('script');
+                script.src = src;
+                script.async = true;
+                script.defer = true;
+                script.onload = resolve;
+                script.onerror = reject;
+                document.head.appendChild(script);
+            });
+        }
 
-            const gisScript = document.createElement('script');
-            gisScript.src = 'https://accounts.google.com/gsi/client?onload=gisLoaded';
-            gisScript.async = true;
-            gisScript.defer = true;
-            document.head.appendChild(gisScript);
+        async function initializeGoogleApis() {
+            try {
+                await loadScript('https://apis.google.com/js/api.js');
+                gapi = window.gapi;
+                
+                gapi.load('client', async () => {
+                    await initializeGapiClient();
+                    
+                    await loadScript('https://accounts.google.com/gsi/client');
+                    initializeGisClient();
+                });
+            } catch (error) {
+                console.error("Failed to load Google API scripts:", error);
+                gdriveAuthBtn.textContent = 'Script Load Error';
+                showAlert("Failed to load necessary Google libraries. Please check your internet connection and refresh.", "error");
+            }
         }
 
         // --- Initial Load ---
         loadSettings();
-        setupAndLoadGoogleApis();
+        initializeGoogleApis();
         showPage('home-page');
         const savedTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
         applyTheme(savedTheme);
