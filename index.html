@@ -268,8 +268,8 @@
         let tokenClient;
         
         // --- Google Drive Configuration ---
-        const GOOGLE_CLIENT_ID = "435849312063-815sr50dkvidusrbltfmb57isc0ff148.apps.googleusercontent.com"; // Replace with your actual Client ID
-        const GOOGLE_API_KEY = "AIzaSyA3n25zgMMgg7tqaGpSn2hXU8bOQHnv2ho"; // Replace with your actual API Key
+        const GOOGLE_CLIENT_ID = "YOUR_GOOGLE_CLIENT_ID_HERE"; // Replace with your actual Client ID
+        const GOOGLE_API_KEY = "YOUR_GOOGLE_API_KEY_HERE"; // Replace with your actual API Key
 
         const DRIVE_DISCOVERY_DOC = 'https://www.googleapis.com/discovery/v1/apis/drive/v3/rest';
         const DRIVE_SCOPES = 'https://www.googleapis.com/auth/drive.file';
@@ -312,11 +312,17 @@
                             gapi.client.setToken(tokenResponse);
                             updateDriveUi(true);
                         } else {
-                            console.error("No access token received from GIS callback.");
-                            updateDriveUi(false);
+                            // This can happen if silent sign-in fails, which is expected for new users.
+                            console.log("No access token from silent sign-in. User needs to sign in manually.");
+                            updateDriveUi(false); // Ensure UI shows the connect button
                         }
                     },
                 });
+
+                // Attempt to sign in silently on page load
+                tokenClient.requestAccessToken({ prompt: 'none' });
+
+                // Enable the manual sign-in button regardless, in case silent sign-in fails
                 gdriveAuthBtn.disabled = false;
                 gdriveAuthBtn.innerHTML = `
                     <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M21.12,10.2h-9.3c-0.44,0-0.8,0.36-0.8,0.8s0.36,0.8,0.8,0.8h8.48c-0.53,4.32-4.13,7.59-8.48,7.59c-4.73,0-8.59-3.86-8.59-8.59 s3.86-8.59,8.59-8.59c2.25,0,4.29,0.88,5.81,2.3l1.13-1.13C17.3,3.31,14.8,2,11.82,2C6.4,2,2,6.4,2,11.82s4.4,9.82,9.82,9.82 c5.21,0,9.47-4.09,9.8-9.32C21.68,11.19,21.46,10.2,21.12,10.2z"></path></svg>
