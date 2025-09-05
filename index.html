@@ -141,12 +141,11 @@
                         <h3 class="text-lg font-semibold border-b border-slate-200 dark:border-slate-700 pb-3 mb-4">Google Drive Backup</h3>
                         <p class="text-sm text-slate-500 dark:text-slate-400 mb-4">သင်၏မှတ်စုများကို Google Drive တွင် လုံခြုံစွာ သိမ်းဆည်းရန်နှင့် ပြန်လည်ရယူရန် ချိတ်ဆက်ပါ။</p>
                         
-                        <!-- MODIFIED: Button is disabled by default and text is changed -->
                         <div id="drive-auth-container" class="mt-4">
-                             <button id="gdrive-auth-btn" class="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 font-semibold transition flex items-center justify-center gap-2" disabled>
-                                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M21.12,10.2h-9.3c-0.44,0-0.8,0.36-0.8,0.8s0.36,0.8,0.8,0.8h8.48c-0.53,4.32-4.13,7.59-8.48,7.59c-4.73,0-8.59-3.86-8.59-8.59 s3.86-8.59,8.59-8.59c2.25,0,4.29,0.88,5.81,2.3l1.13-1.13C17.3,3.31,14.8,2,11.82,2C6.4,2,2,6.4,2,11.82s4.4,9.82,9.82,9.82 c5.21,0,9.47-4.09,9.8-9.32C21.68,11.19,21.46,10.2,21.12,10.2z"></path></svg>
-                                <span>Initializing...</span>
-                            </button>
+                               <button id="gdrive-auth-btn" class="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 font-semibold transition flex items-center justify-center gap-2" disabled>
+                                   <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M21.12,10.2h-9.3c-0.44,0-0.8,0.36-0.8,0.8s0.36,0.8,0.8,0.8h8.48c-0.53,4.32-4.13,7.59-8.48,7.59c-4.73,0-8.59-3.86-8.59-8.59 s3.86-8.59,8.59-8.59c2.25,0,4.29,0.88,5.81,2.3l1.13-1.13C17.3,3.31,14.8,2,11.82,2C6.4,2,2,6.4,2,11.82s4.4,9.82,9.82,9.82 c5.21,0,9.47-4.09,9.8-9.32C21.68,11.19,21.46,10.2,21.12,10.2z"></path></svg>
+                                   <span>Initializing...</span>
+                               </button>
                         </div>
                         <div id="drive-sync-container" class="mt-4 hidden">
                             <p id="drive-status" class="text-sm text-center text-green-600 dark:text-green-400 mb-4"></p>
@@ -272,12 +271,18 @@
         let gapi;
         let tokenClient;
         
-        const GOOGLE_CLIENT_ID = "435849312063-815sr50dkvidusrbltfmb57isc0ff148.apps.googleusercontent.com"; 
+        // --- Google Drive Configuration ---
+        // TODO: Get your Client ID and API Key from https://console.cloud.google.com/
+        // Make sure to add your website's URL to the "Authorized JavaScript origins"
+        // and "Authorized redirect URIs" in your OAuth 2.0 Client ID settings.
+        const GOOGLE_CLIENT_ID = "435849312063-815sr50dkvidusrbltfmb57isc0ff148.apps.googleusercontent.com"; // Replace with your actual Client ID
+        const GOOGLE_API_KEY = "AIzaSyA3n25zgMMgg7tqaGpSn2hXU8bOQHnv2ho"; // Replace with your actual API Key
 
         const DRIVE_DISCOVERY_DOC = 'https://www.googleapis.com/discovery/v1/apis/drive/v3/rest';
         const DRIVE_SCOPES = 'https://www.googleapis.com/auth/drive.file';
         const BACKUP_FILE_NAME = 'zinnotes_backup.json';
         
+        // --- Google API Initialization ---
         window.gapiLoaded = () => {
             gapi = window.gapi;
             gapi.load('client', initializeGapiClient);
@@ -285,12 +290,24 @@
 
         async function initializeGapiClient() {
             try {
-                await gapi.client.init({ discoveryDocs: [DRIVE_DISCOVERY_DOC] });
-            } catch (error) { console.error("Error initializing GAPI client:", error); }
+                // FIXED: Added the API Key for proper client initialization.
+                await gapi.client.init({
+                    apiKey: GOOGLE_API_KEY,
+                    discoveryDocs: [DRIVE_DISCOVERY_DOC]
+                });
+            } catch (error) {
+                console.error("Error initializing GAPI client:", error);
+                gdriveAuthBtn.textContent = 'API Init Error';
+                gdriveAuthBtn.disabled = true;
+                showAlert('Could not initialize Google API client. Please check your API Key and console for errors.', 'error');
+            }
         }
 
         window.gisLoaded = () => {
-            if (GOOGLE_CLIENT_ID && GOOGLE_CLIENT_ID !== "435849312063-815sr50dkvidusrbltfmb57isc0ff148.apps.googleusercontent.com") {
+            // FIXED: The conditional logic here was incorrect.
+            // It was preventing initialization if the correct client ID was provided.
+            // This now correctly checks if a non-placeholder ID is present.
+            if (GOOGLE_CLIENT_ID && GOOGLE_CLIENT_ID !== "YOUR_GOOGLE_CLIENT_ID_HERE") {
                 try {
                     tokenClient = google.accounts.oauth2.initTokenClient({
                         client_id: GOOGLE_CLIENT_ID,
@@ -305,7 +322,7 @@
                             }
                         },
                     });
-                    // FIXED: Enable the button and change text once the client is ready
+                    // Enable the button and change text once the client is ready
                     gdriveAuthBtn.disabled = false;
                     gdriveAuthBtn.innerHTML = `
                         <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M21.12,10.2h-9.3c-0.44,0-0.8,0.36-0.8,0.8s0.36,0.8,0.8,0.8h8.48c-0.53,4.32-4.13,7.59-8.48,7.59c-4.73,0-8.59-3.86-8.59-8.59 s3.86-8.59,8.59-8.59c2.25,0,4.29,0.88,5.81,2.3l1.13-1.13C17.3,3.31,14.8,2,11.82,2C6.4,2,2,6.4,2,11.82s4.4,9.82,9.82,9.82 c5.21,0,9.47-4.09,9.8-9.32C21.68,11.19,21.46,10.2,21.12,10.2z"></path></svg>
@@ -316,8 +333,9 @@
                     gdriveAuthBtn.disabled = true;
                 }
             } else {
-                 gdriveAuthBtn.textContent = 'Client ID not set';
-                 gdriveAuthBtn.disabled = true;
+                console.error("Google Client ID is not set. Please set the GOOGLE_CLIENT_ID constant.");
+                gdriveAuthBtn.textContent = 'Client ID not set';
+                gdriveAuthBtn.disabled = true;
             }
         };
         
@@ -346,6 +364,7 @@
         const showModal = (htmlContent) => {
             modalContent.innerHTML = htmlContent;
             modalContainer.classList.remove('hidden');
+            // Use a short timeout to ensure elements are in the DOM before attaching listeners
             setTimeout(() => {
                 modalContent.querySelectorAll('.modal-close, .modal-cancel').forEach(btn => btn.onclick = hideModal);
             }, 30);
@@ -503,6 +522,8 @@
             if (!notionApiKey || !notionDbId) { showAlert('Please set your Notion settings first.', 'error'); return; }
             showModal(`<div class="p-6 text-center"><p class="text-lg">Saving to Notion...</p></div>`);
             try {
+                // This requires a server-side proxy to work due to CORS.
+                // For this example, we assume one exists at '/api/saveToNotion'
                 const response = await fetch('/api/saveToNotion', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -595,22 +616,21 @@
                 themeToggleIndicator.classList.add('translate-x-5');
             } else {
                 document.documentElement.classList.remove('dark');
+                document.documentElement.classList.remove('dark'); // Double check removal
                 themeToggleIndicator.classList.remove('translate-x-5');
             }
         };
 
         function handleAuthClick() {
-            if (GOOGLE_CLIENT_ID === "YOUR_GOOGLE_CLIENT_ID_HERE") {
-                showAlert('Google Client ID has not been set by the developer.', 'error');
-                return;
-            }
             if (!tokenClient) {
                 showAlert('Google Auth is not ready. Please wait a moment and try again.', 'error');
                 return;
             }
             if (gapi.client.getToken() === null) {
+                // Prompt the user to select an account and grant access on first sign-in.
                 tokenClient.requestAccessToken({ prompt: 'consent' });
             } else {
+                // Skip the account selection prompt on subsequent calls.
                 tokenClient.requestAccessToken({ prompt: '' });
             }
         }
@@ -657,21 +677,45 @@
             const content = JSON.stringify(notes, null, 2);
             const blob = new Blob([content], { type: 'application/json' });
             const fileId = await searchForBackupFile();
-            const formData = new FormData();
+            
+            // Using gapi.client.request for multipart upload
+            const boundary = '-------314159265358979323846';
+            const delimiter = "\r\n--" + boundary + "\r\n";
+            const close_delim = "\r\n--" + boundary + "--";
+            
             const metadata = { name: BACKUP_FILE_NAME, mimeType: 'application/json' };
-            formData.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
-            formData.append('file', blob);
+            
+            const reader = new FileReader();
+            reader.readAsBinaryString(blob);
+            reader.onload = async () => {
+                const fileData = reader.result;
+                const multipartRequestBody =
+                    delimiter +
+                    'Content-Type: application/json\r\n\r\n' +
+                    JSON.stringify(metadata) +
+                    delimiter +
+                    'Content-Type: application/json\r\n' +
+                    'Content-Transfer-Encoding: base64\r\n\r\n' +
+                    btoa(fileData) +
+                    close_delim;
 
-            const path = fileId ? `/upload/drive/v3/files/${fileId}` : '/upload/drive/v3/files';
-            const method = fileId ? 'PATCH' : 'POST';
+                const path = fileId ? `/upload/drive/v3/files/${fileId}` : '/upload/drive/v3/files';
+                const method = fileId ? 'PATCH' : 'POST';
 
-            try {
-                await gapi.client.request({ path, method, params: { uploadType: 'multipart' }, body: formData });
-                showToast("Backup successful!");
-            } catch (err) {
-                console.error("Error during backup:", err);
-                showAlert("Backup failed. See console for details.", 'error');
-            }
+                try {
+                    await gapi.client.request({
+                        path,
+                        method,
+                        params: { uploadType: 'multipart' },
+                        headers: { 'Content-Type': 'multipart/related; boundary="' + boundary + '"' },
+                        body: multipartRequestBody,
+                    });
+                    showToast("Backup successful!");
+                } catch (err) {
+                    console.error("Error during backup:", err);
+                    showAlert("Backup failed. See console for details.", 'error');
+                }
+            };
         }
 
         async function restoreFromDrive() {
@@ -684,12 +728,14 @@
                  if (!Array.isArray(importedNotes)) throw new Error("Invalid backup file format.");
                  showConfirm(`Found ${importedNotes.length} notes in backup. This will overwrite current notes. Continue?`, () => {
                      saveToStorage(NOTES_KEY, importedNotes);
-                     renderNotes();
+                     if (document.getElementById('notes-page').classList.contains('hidden') === false) {
+                        renderNotes();
+                     }
                      showToast("Restore successful!");
                  });
              } catch (err) {
-                console.error("Error during restore:", err);
-                showAlert("Restore failed. See console for details.", 'error');
+                 console.error("Error during restore:", err);
+                 showAlert("Restore failed. See console for details.", 'error');
              }
         }
         
@@ -739,10 +785,9 @@
         // --- Initial Load ---
         loadSettings();
         showPage('home-page');
-        const savedTheme = localStorage.getItem('theme') || 'light';
+        const savedTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
         applyTheme(savedTheme);
 
     </script>
 </body>
 </html>
-
