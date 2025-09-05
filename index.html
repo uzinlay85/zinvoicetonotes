@@ -141,10 +141,11 @@
                         <h3 class="text-lg font-semibold border-b border-slate-200 dark:border-slate-700 pb-3 mb-4">Google Drive Backup</h3>
                         <p class="text-sm text-slate-500 dark:text-slate-400 mb-4">သင်၏မှတ်စုများကို Google Drive တွင် လုံခြုံစွာ သိမ်းဆည်းရန်နှင့် ပြန်လည်ရယူရန် ချိတ်ဆက်ပါ။</p>
                         
+                        <!-- MODIFIED: Button is disabled by default and text is changed -->
                         <div id="drive-auth-container" class="mt-4">
-                             <button id="gdrive-auth-btn" class="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 font-semibold transition flex items-center justify-center gap-2">
+                             <button id="gdrive-auth-btn" class="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 font-semibold transition flex items-center justify-center gap-2" disabled>
                                 <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M21.12,10.2h-9.3c-0.44,0-0.8,0.36-0.8,0.8s0.36,0.8,0.8,0.8h8.48c-0.53,4.32-4.13,7.59-8.48,7.59c-4.73,0-8.59-3.86-8.59-8.59 s3.86-8.59,8.59-8.59c2.25,0,4.29,0.88,5.81,2.3l1.13-1.13C17.3,3.31,14.8,2,11.82,2C6.4,2,2,6.4,2,11.82s4.4,9.82,9.82,9.82 c5.21,0,9.47-4.09,9.8-9.32C21.68,11.19,21.46,10.2,21.12,10.2z"></path></svg>
-                                Connect to Google Drive
+                                <span>Initializing...</span>
                             </button>
                         </div>
                         <div id="drive-sync-container" class="mt-4 hidden">
@@ -226,7 +227,6 @@
     <script type="module">
         import { GoogleGenerativeAI } from "https://cdn.jsdelivr.net/npm/@google/generative-ai/+esm";
 
-        // FIXED: All code is now at the top-level of the module, not inside DOMContentLoaded
         const themeToggle = document.getElementById('theme-toggle');
         const themeToggleIndicator = document.getElementById('theme-toggle-indicator');
         const toastContainer = document.getElementById('toast-container');
@@ -278,8 +278,6 @@
         const DRIVE_SCOPES = 'https://www.googleapis.com/auth/drive.file';
         const BACKUP_FILE_NAME = 'zinnotes_backup.json';
         
-        // --- All functions are now in the top-level scope of the module ---
-        
         window.gapiLoaded = () => {
             gapi = window.gapi;
             gapi.load('client', initializeGapiClient);
@@ -292,7 +290,7 @@
         }
 
         window.gisLoaded = () => {
-            if (GOOGLE_CLIENT_ID && GOOGLE_CLIENT_ID !== "YOUR_GOOGLE_CLIENT_ID_HERE") {
+            if (GOOGLE_CLIENT_ID && GOOGLE_CLIENT_ID !== "435849312063-815sr50dkvidusrbltfmb57isc0ff148.apps.googleusercontent.com") {
                 try {
                     tokenClient = google.accounts.oauth2.initTokenClient({
                         client_id: GOOGLE_CLIENT_ID,
@@ -307,7 +305,19 @@
                             }
                         },
                     });
-                } catch(error){ console.error("Error initializing GIS client:", error); }
+                    // FIXED: Enable the button and change text once the client is ready
+                    gdriveAuthBtn.disabled = false;
+                    gdriveAuthBtn.innerHTML = `
+                        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M21.12,10.2h-9.3c-0.44,0-0.8,0.36-0.8,0.8s0.36,0.8,0.8,0.8h8.48c-0.53,4.32-4.13,7.59-8.48,7.59c-4.73,0-8.59-3.86-8.59-8.59 s3.86-8.59,8.59-8.59c2.25,0,4.29,0.88,5.81,2.3l1.13-1.13C17.3,3.31,14.8,2,11.82,2C6.4,2,2,6.4,2,11.82s4.4,9.82,9.82,9.82 c5.21,0,9.47-4.09,9.8-9.32C21.68,11.19,21.46,10.2,21.12,10.2z"></path></svg>
+                        <span>Connect to Google Drive</span>`;
+                } catch(error){ 
+                    console.error("Error initializing GIS client:", error);
+                    gdriveAuthBtn.textContent = 'Auth Error';
+                    gdriveAuthBtn.disabled = true;
+                }
+            } else {
+                 gdriveAuthBtn.textContent = 'Client ID not set';
+                 gdriveAuthBtn.disabled = true;
             }
         };
         
@@ -590,7 +600,7 @@
         };
 
         function handleAuthClick() {
-            if (GOOGLE_CLIENT_ID === "435849312063-815sr50dkvidusrbltfmb57isc0ff148.apps.googleusercontent.com") {
+            if (GOOGLE_CLIENT_ID === "YOUR_GOOGLE_CLIENT_ID_HERE") {
                 showAlert('Google Client ID has not been set by the developer.', 'error');
                 return;
             }
