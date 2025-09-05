@@ -130,7 +130,7 @@
                             <h3 class="text-lg font-semibold">Dark Mode</h3>
                             <button id="theme-toggle" class="relative inline-flex items-center h-6 rounded-full w-11 transition-colors bg-slate-200 dark:bg-indigo-600">
                                 <span class="sr-only">Enable Dark Mode</span>
-                                <span class="inline-block w-4 h-4 transform bg-white rounded-full transition-transform translate-x-1 dark:translate-x-6"></span>
+                                <span id="theme-toggle-indicator" class="inline-block w-4 h-4 transform bg-white rounded-full transition-transform translate-x-1 dark:translate-x-6"></span>
                             </button>
                         </div>
                     </div>
@@ -181,13 +181,21 @@
                         </details>
                     </div>
 
-                    <!-- FIXED: Data Management Card is re-added here -->
                     <div class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-md border border-slate-200 dark:border-slate-700">
                         <h3 class="text-lg font-semibold border-b border-slate-200 dark:border-slate-700 pb-3 mb-4">Data Management</h3>
                         <div class="flex gap-4">
                             <button id="export-btn" class="flex-1 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 font-semibold transition">Export Notes</button>
                             <input type="file" id="import-file" accept=".json" class="hidden">
                             <button id="import-btn" class="flex-1 bg-teal-600 text-white px-4 py-2 rounded-lg hover:bg-teal-700 font-semibold transition">Import Notes</button>
+                        </div>
+                    </div>
+                    
+                    <!-- NEW: Contact/About Card Added Here -->
+                    <div class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-md border border-slate-200 dark:border-slate-700">
+                        <h3 class="text-lg font-semibold border-b border-slate-200 dark:border-slate-700 pb-3 mb-4">ဆက်သွယ်အကြံပြုရန်</h3>
+                        <div class="text-sm text-slate-600 dark:text-slate-400 space-y-3">
+                            <p>ဤ web app ကို ဝါသနာအရ Ai ဖြင့် ပြုလုပ်ထားပါသည်။ တစ်စုံတစ်ခု အကျိုးရှိမည်ဟု မျှော်လင့်ပါသည်။</p>
+                            <p>အကြံပေးလိုပါက <a href="https://t.me/upanna2" target="_blank" class="text-indigo-600 dark:text-indigo-400 font-semibold hover:underline">@upanna2 Telegram</a> သို့ ဆက်သွယ် အကြံပြုနိုင်ပါသည်။</p>
                         </div>
                     </div>
                 </div>
@@ -232,6 +240,7 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             const themeToggle = document.getElementById('theme-toggle');
+            const themeToggleIndicator = document.getElementById('theme-toggle-indicator');
             const toastContainer = document.getElementById('toast-container');
             const searchInput = document.getElementById('search-notes');
             
@@ -583,15 +592,17 @@
             });
 
             const applyTheme = (theme) => {
+                localStorage.setItem('theme', theme);
                 if (theme === 'dark') {
                     document.documentElement.classList.add('dark');
+                    themeToggleIndicator.classList.add('translate-x-5');
                 } else {
                     document.documentElement.classList.remove('dark');
+                    themeToggleIndicator.classList.remove('translate-x-5');
                 }
-                localStorage.setItem('theme', theme);
             };
             themeToggle.addEventListener('click', () => {
-                const currentTheme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+                const currentTheme = localStorage.getItem('theme') || 'light';
                 const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
                 applyTheme(newTheme);
             });
